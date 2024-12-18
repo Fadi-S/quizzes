@@ -5,6 +5,7 @@ namespace App\Models;
 use Filament\Facades\Filament;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Facades\Hash;
 
 class Game extends Model
@@ -26,6 +27,16 @@ class Game extends Model
     public function apiKeys() : HasMany
     {
         return $this->hasMany(ApiKey::class);
+    }
+
+    public function groups() : HasMany
+    {
+        return $this->hasMany(Group::class);
+    }
+
+    public function quizzes() : HasManyThrough
+    {
+        return $this->hasManyThrough(Quiz::class, Group::class);
     }
 
     public function createAPIKey(): array

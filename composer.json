@@ -10,7 +10,8 @@
         "filament/filament": "^3.2",
         "laravel/framework": "^11.31",
         "laravel/tinker": "^2.9",
-        "predis/predis": "^2.3"
+        "predis/predis": "^2.3",
+        "staudenmeir/eloquent-has-many-deep": "^1.20"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^3.2",
