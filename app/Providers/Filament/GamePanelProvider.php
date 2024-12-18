@@ -2,11 +2,14 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Resources\GameResource\Widgets\GamesWidget;
+use App\Http\Middleware\ApplyGameThemeColors;
 use App\Models\Game;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\NavigationItem;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -17,6 +20,7 @@ use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class GamePanelProvider extends PanelProvider
@@ -24,6 +28,7 @@ class GamePanelProvider extends PanelProvider
     public function panel(Panel $panel): Panel
     {
         return $panel
+            ->login()
             ->id('game')
             ->path('game')
             ->colors([
@@ -37,7 +42,13 @@ class GamePanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Game/Widgets'), for: 'App\\Filament\\Game\\Widgets')
             ->widgets([
                 Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
+            ])
+            ->navigationItems([
+                NavigationItem::make('Admin Panel')
+                    ->icon('heroicon-o-adjustments-horizontal')
+                    ->url('/admin')
+                ->visible(fn () => auth()->user()?->isAdmin())
+                ,
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -53,6 +64,10 @@ class GamePanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ])
+            ->tenantMiddleware([
+                ApplyGameThemeColors::class,
+            ])
+            ->renderHook('panels::body.end', fn (): string => Blade::render("@vite('resources/js/app.js')"))
             ->tenant(Game::class)
             ;
     }

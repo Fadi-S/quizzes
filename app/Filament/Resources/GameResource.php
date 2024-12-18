@@ -34,6 +34,8 @@ class GameResource extends Resource
                     ->disabled()
                     ->required(),
 
+                Forms\Components\ColorPicker::make('color'),
+
                 Forms\Components\FileUpload::make('picture')
                     ->visibility('public')
                     ->directory('games')
@@ -59,13 +61,20 @@ class GameResource extends Resource
                     ->sortable()
                     ->dateTime("M j, Y h:i A")
                     ->label("Created At"),
+
+                Tables\Columns\ColorColumn::make('color'),
             ])
             ->filters([
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\ViewAction::make(),
+                Tables\Actions\EditAction::make()
+                ->color('warning'),
+
+                Tables\Actions\Action::make('manage')
+                    ->icon('heroicon-o-cog-6-tooth')
+                    ->color('primary')
+                    ->url(fn($record) => "/game/$record->slug"),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -87,7 +96,6 @@ class GameResource extends Resource
             'index' => Pages\ListGames::route('/'),
             'create' => Pages\CreateGame::route('/create'),
             'edit' => Pages\EditGame::route('/{record}/edit'),
-            'view' => Pages\ViewGame::route('/{record}'),
         ];
     }
 }

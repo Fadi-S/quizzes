@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
+use Filament\Facades\Filament;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 
 class Game extends Model
@@ -16,6 +16,11 @@ class Game extends Model
         });
 
         parent::boot();
+    }
+
+    public function getRouteKeyName()
+    {
+        return "slug";
     }
 
     public function apiKeys() : HasMany
@@ -42,16 +47,12 @@ class Game extends Model
     public static function current() : ?self
     {
         $id = auth()->id();
-        $currentGameId = session('current_game_id');
+        $currentGame = Filament::getTenant();
 
-        if(!$id || !$currentGameId) {
+        if(!$id || !$currentGame instanceof self) {
             return null;
         }
 
-        return Cache::remember(
-            "game_$currentGameId",
-            now()->addMinutes(5),
-            fn() => static::find($currentGameId)
-        );
+        return $currentGame;
     }
 }
