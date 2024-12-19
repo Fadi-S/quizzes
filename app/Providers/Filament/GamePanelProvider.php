@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Game\Widgets\ApiKeysList;
 use App\Filament\Resources\GameResource\Widgets\GamesWidget;
 use App\Http\Middleware\ApplyGameThemeColors;
 use App\Models\Game;
@@ -29,26 +30,30 @@ class GamePanelProvider extends PanelProvider
     {
         return $panel
             ->login()
-            ->id('game')
-            ->path('game')
+            ->id("game")
+            ->path("game")
             ->colors([
-                'primary' => Color::Amber,
+                "primary" => Color::Amber,
             ])
-            ->discoverResources(in: app_path('Filament/Game/Resources'), for: 'App\\Filament\\Game\\Resources')
-            ->discoverPages(in: app_path('Filament/Game/Pages'), for: 'App\\Filament\\Game\\Pages')
-            ->pages([
-                Pages\Dashboard::class,
-            ])
-            ->discoverWidgets(in: app_path('Filament/Game/Widgets'), for: 'App\\Filament\\Game\\Widgets')
-            ->widgets([
-                Widgets\AccountWidget::class,
-            ])
+            ->discoverResources(
+                in: app_path("Filament/Game/Resources"),
+                for: "App\\Filament\\Game\\Resources",
+            )
+            ->discoverPages(
+                in: app_path("Filament/Game/Pages"),
+                for: "App\\Filament\\Game\\Pages",
+            )
+            ->pages([Pages\Dashboard::class])
+            ->discoverWidgets(
+                in: app_path("Filament/Game/Widgets"),
+                for: "App\\Filament\\Game\\Widgets",
+            )
+            ->widgets([Widgets\AccountWidget::class, ApiKeysList::class])
             ->navigationItems([
-                NavigationItem::make('Admin Panel')
-                    ->icon('heroicon-o-adjustments-horizontal')
-                    ->url('/admin')
-                ->visible(fn () => auth()->user()?->isAdmin())
-                ,
+                NavigationItem::make("Admin Panel")
+                    ->icon("heroicon-o-adjustments-horizontal")
+                    ->url("/admin")
+                    ->visible(fn() => auth()->user()?->isAdmin()),
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -61,14 +66,12 @@ class GamePanelProvider extends PanelProvider
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
             ])
-            ->authMiddleware([
-                Authenticate::class,
-            ])
-            ->tenantMiddleware([
-                ApplyGameThemeColors::class,
-            ])
-            ->renderHook('panels::body.end', fn (): string => Blade::render("@vite('resources/js/app.js')"))
-            ->tenant(Game::class)
-            ;
+            ->authMiddleware([Authenticate::class])
+            ->tenantMiddleware([ApplyGameThemeColors::class])
+            ->renderHook(
+                "panels::body.end",
+                fn(): string => Blade::render("@vite('resources/js/app.js')"),
+            )
+            ->tenant(Game::class);
     }
 }

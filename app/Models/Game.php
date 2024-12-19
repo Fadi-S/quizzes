@@ -24,17 +24,22 @@ class Game extends Model
         return "slug";
     }
 
-    public function apiKeys() : HasMany
+    public function apiKeys(): HasMany
     {
         return $this->hasMany(ApiKey::class);
     }
 
-    public function groups() : HasMany
+    public function groups(): HasMany
     {
         return $this->hasMany(Group::class);
     }
 
-    public function quizzes() : HasManyThrough
+    public function entities(): HasManyThrough
+    {
+        return $this->hasManyThrough(Entity::class, Group::class);
+    }
+
+    public function quizzes(): HasManyThrough
     {
         return $this->hasManyThrough(Quiz::class, Group::class);
     }
@@ -45,22 +50,22 @@ class Game extends Model
         $secret = ApiKey::generate();
 
         $this->apiKeys()->create([
-            'key' => $key,
-            'secret' => Hash::make($secret),
+            "key" => $key,
+            "secret" => Hash::make($secret),
         ]);
 
         return [
-            'key' => $key,
-            'secret' => $secret,
+            "key" => $key,
+            "secret" => $secret,
         ];
     }
 
-    public static function current() : ?self
+    public static function current(): ?self
     {
         $id = auth()->id();
         $currentGame = Filament::getTenant();
 
-        if(!$id || !$currentGame instanceof self) {
+        if (!$id || !$currentGame instanceof self) {
             return null;
         }
 
