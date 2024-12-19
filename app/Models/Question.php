@@ -15,6 +15,23 @@ class Question extends Model
         'type' => QuestionType::class,
     ];
 
+    protected static function boot()
+    {
+        static::creating(function (Question $model) {
+            if($model->type === QuestionType::Written) {
+                $model->correct_answers = [];
+            }
+        });
+
+        static::updating(function (Question $model) {
+            if($model->type === QuestionType::Written) {
+                $model->correct_answers = [];
+            }
+        });
+
+        parent::boot();
+    }
+
     public function quiz() : BelongsTo
     {
         return $this->belongsTo(Quiz::class);

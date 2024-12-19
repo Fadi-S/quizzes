@@ -12,6 +12,16 @@ class Quiz extends Model
 {
     use HasRelationships;
 
+    protected static function boot()
+    {
+        static::creating(function ($model) {
+
+            $model->slug = str($model->name)->slug(language: null);
+        });
+
+        parent::boot();
+    }
+
     public function group() : BelongsTo
     {
         return $this->belongsTo(Group::class);

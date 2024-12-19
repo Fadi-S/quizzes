@@ -18,7 +18,7 @@ return new class extends Migration
             $table->unsignedTinyInteger('order');
             $table->string('picture')->nullable();
 
-            $table->unique(['question_id', 'order']);
+//            $table->unique(['question_id', 'order']);
             $table->unique(['question_id', 'name']);
         });
     }
