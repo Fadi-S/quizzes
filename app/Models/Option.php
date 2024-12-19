@@ -28,6 +28,10 @@ class Option extends Model
                 ->visibility("public")
                 ->directory("questions")
                 ->image()
+                ->visible(
+                    fn($get) => QuestionType::tryFrom($get("../../type")) !==
+                        QuestionType::Written,
+                )
                 ->nullable(),
 
             Forms\Components\Checkbox::make("is_correct")
