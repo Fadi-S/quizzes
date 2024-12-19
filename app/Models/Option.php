@@ -11,32 +11,35 @@ class Option extends Model
 {
     public $timestamps = false;
 
-    public function question() : BelongsTo
+    public function question(): BelongsTo
     {
         return $this->belongsTo(Question::class);
     }
 
-    public static function getForm() : array
+    public static function getForm(): array
     {
         return [
-            Forms\Components\TextInput::make('name')
+            Forms\Components\TextInput::make("name")
                 ->live()
                 ->columnSpan(1)
                 ->required(),
-            Forms\Components\FileUpload::make('picture')
+            Forms\Components\FileUpload::make("picture")
                 ->columnSpan(1)
-                ->visibility('public')
+                ->visibility("public")
+                ->directory("questions")
                 ->image()
                 ->nullable(),
 
-            Forms\Components\Checkbox::make('is_correct')
+            Forms\Components\Checkbox::make("is_correct")
                 ->afterStateHydrated(function ($state, Forms\Get $get, $set) {
-                    $answers = collect($get('../../correct_answers') ?: []);
+                    $answers = collect($get("../../correct_answers") ?: []);
 
-                    $set("is_correct", $answers->contains($get('order')));
+                    $set("is_correct", $answers->contains($get("order")));
                 })
-                ->dehydrated(false)
-                ->visible(fn($get) => QuestionType::tryFrom($get('../../type')) === QuestionType::Choose),
+                ->visible(
+                    fn($get) => QuestionType::tryFrom($get("../../type")) ===
+                        QuestionType::Choose,
+                ),
         ];
     }
 }
