@@ -35,7 +35,7 @@ class GroupResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([Tables\Actions\EditAction::make()])
+            ->actions([Tables\Actions\EditAction::make()->slideOver()])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
@@ -55,7 +55,7 @@ class GroupResource extends Resource
         return [
             "index" => Pages\ListGroups::route("/"),
             "create" => Pages\CreateGroup::route("/create"),
-            "edit" => Pages\EditGroup::route("/{record}/edit"),
+            //            "edit" => Pages\EditGroup::route("/{record}/edit"),
         ];
     }
 }

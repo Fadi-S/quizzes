@@ -39,7 +39,7 @@ class EntityResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([Tables\Actions\EditAction::make()])
+            ->actions([Tables\Actions\EditAction::make()->slideOver()])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
@@ -59,7 +59,7 @@ class EntityResource extends Resource
         return [
             "index" => Pages\ListEntities::route("/"),
             "create" => Pages\CreateEntity::route("/create"),
-            "edit" => Pages\EditEntity::route("/{record}/edit"),
+            //            "edit" => Pages\EditEntity::route("/{record}/edit"),
         ];
     }
 }

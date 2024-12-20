@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\QuestionType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -74,6 +75,7 @@ class Quiz extends Model
                 ->collapsed(fn($record) => $record?->exists)
                 ->cloneable()
                 ->itemLabel(fn($state) => $state["title"] ?? "New Question *")
+                ->defaultItems(0)
                 ->saveRelationshipsUsing(function (Quiz $record, $state) {
                     $allOptions = collect();
                     foreach ($state as $question) {

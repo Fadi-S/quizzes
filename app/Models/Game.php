@@ -47,7 +47,7 @@ class Game extends Model
     public function createAPIKey(): array
     {
         $key = ApiKey::generate();
-        $secret = ApiKey::generate();
+        $secret = ApiKey::generate(64);
 
         $this->apiKeys()->create([
             "key" => $key,

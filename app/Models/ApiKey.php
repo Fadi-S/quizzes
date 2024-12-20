@@ -9,6 +9,8 @@ class ApiKey extends Model
 {
     use BelongsToGame;
 
+    protected $hidden = ["secret"];
+
     /**
      * Generate a cryptographically secure random key.
      *

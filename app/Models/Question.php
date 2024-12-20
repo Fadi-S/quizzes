@@ -62,6 +62,12 @@ class Question extends Model
                     $type = QuestionType::tryFrom($get("type"));
                     return $type === QuestionType::Written ? null : 6;
                 })
+                ->defaultItems(
+                    fn($get) => QuestionType::tryFrom($get("type")) ===
+                    QuestionType::Written
+                        ? 1
+                        : 2,
+                )
                 ->orderColumn("order")
                 ->itemLabel(fn($state) => $state["name"] ?? "...")
                 ->reorderableWithDragAndDrop()

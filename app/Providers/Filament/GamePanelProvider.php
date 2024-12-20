@@ -48,7 +48,7 @@ class GamePanelProvider extends PanelProvider
                 in: app_path("Filament/Game/Widgets"),
                 for: "App\\Filament\\Game\\Widgets",
             )
-            ->widgets([Widgets\AccountWidget::class, ApiKeysList::class])
+            ->widgets([ApiKeysList::class])
             ->navigationItems([
                 NavigationItem::make("Admin Panel")
                     ->icon("heroicon-o-adjustments-horizontal")
