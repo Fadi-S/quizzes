@@ -20,6 +20,11 @@ class GameResource extends JsonResource
             "slug" => $this->slug,
             "picture" => $this->picture,
             "data" => $this->data,
+
+            "groups" => $this->whenLoaded(
+                "groups",
+                fn() => GroupResource::collection($this->groups),
+            ),
         ];
     }
 }

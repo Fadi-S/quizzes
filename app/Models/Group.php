@@ -11,6 +11,10 @@ class Group extends Model
 {
     use BelongsToGame;
 
+    protected $casts = [
+        "data" => "json",
+    ];
+
     public static function getForm(): array
     {
         return [
