@@ -62,6 +62,19 @@ class Game extends Model
 
     public static function current(): ?self
     {
+        if ($auth = request()->header("Authorization")) {
+            $auth = base64_decode(str_replace("Basic ", "", $auth));
+            $auth = explode(":", $auth);
+            $apiKey = ApiKey::query()
+                ->where("key", "=", $auth[0] ?? "")
+                ->with("game")
+                ->first();
+
+            if ($apiKey && Hash::check($auth[1] ?? "", $apiKey->secret)) {
+                return $apiKey->game;
+            }
+        }
+
         $id = auth()->id();
         $currentGame = Filament::getTenant();
 

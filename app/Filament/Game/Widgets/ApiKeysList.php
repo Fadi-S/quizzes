@@ -4,6 +4,8 @@ namespace App\Filament\Game\Widgets;
 
 use App\Models\ApiKey;
 use App\Models\Game;
+use Filament\Actions\Action;
+use Filament\Actions\DeleteAction;
 use Filament\Notifications\Notification;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -39,6 +41,16 @@ class ApiKeysList extends BaseWidget
                     }),
             ])
             ->query(ApiKey::query()->latest())
+            ->actions([
+                Tables\Actions\DeleteAction::make(
+                    "delete",
+                )->requiresConfirmation(),
+            ])
+            ->bulkActions([
+                Tables\Actions\DeleteBulkAction::make("delete")
+                    ->icon("heroicon-o-trash")
+                    ->requiresConfirmation(),
+            ])
             ->columns([
                 Tables\Columns\TextColumn::make("key")->copyable(),
                 Tables\Columns\TextColumn::make("secret")

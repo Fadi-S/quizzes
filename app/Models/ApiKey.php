@@ -4,11 +4,10 @@ namespace App\Models;
 
 use App\Traits\BelongsToGame;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ApiKey extends Model
 {
-    use BelongsToGame;
-
     protected $hidden = ["secret"];
 
     /**
@@ -29,5 +28,10 @@ class ApiKey extends Model
         }
 
         return $buf;
+    }
+
+    public function game(): BelongsTo
+    {
+        return $this->belongsTo(Game::class);
     }
 }
