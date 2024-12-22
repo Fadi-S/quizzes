@@ -28,7 +28,7 @@ class Option extends Model
                 ->required(),
             Forms\Components\FileUpload::make("picture")
                 ->columnSpan(1)
-                ->visibility("public")
+                ->visibility("private")
                 ->directory("options")
                 ->image()
                 ->visible(

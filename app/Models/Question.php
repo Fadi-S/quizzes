@@ -77,7 +77,7 @@ class Question extends Model
                 ->required(),
 
             Forms\Components\FileUpload::make("picture")
-                ->visibility("public")
+                ->visibility("private")
                 ->directory("questions")
                 ->image()
                 ->nullable(),
