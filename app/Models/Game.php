@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\Linkable;
 use Filament\Facades\Filament;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -10,6 +11,8 @@ use Illuminate\Support\Facades\Hash;
 
 class Game extends Model
 {
+    use Linkable;
+
     protected static function boot()
     {
         static::creating(function (Game $game) {
