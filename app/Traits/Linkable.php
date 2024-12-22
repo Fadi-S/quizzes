@@ -43,6 +43,10 @@ trait Linkable
 
         $expires = now()->addMinutes(60);
 
+        if (!config("filesystems.cloudfront.enabled")) {
+            return Storage::temporaryUrl($path, $expires);
+        }
+
         return Cache::remember(
             $path,
             $expires,

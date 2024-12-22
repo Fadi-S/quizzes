@@ -2,6 +2,8 @@
 
 namespace App\Enums;
 
+use App\Questions\CheckQuestion;
+
 enum QuestionType: int
 {
     case Choose = 1;
@@ -26,6 +28,17 @@ enum QuestionType: int
         return match ($this) {
             self::Choose, self::Order, self::Match => true,
             self::Written, self::Slider => false,
+        };
+    }
+
+    public function getChecker(): CheckQuestion
+    {
+        return match ($this) {
+            self::Choose => new CheckQuestion\Choose(),
+            self::Written => new CheckQuestion\Written(),
+            self::Order => new CheckQuestion\Order(),
+            self::Match => new CheckQuestion\Matches(),
+            self::Slider => new CheckQuestion\Slider(),
         };
     }
 }

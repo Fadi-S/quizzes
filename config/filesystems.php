@@ -59,9 +59,11 @@ return [
         ],
 
         "cloudfront" => [
+            "driver" => "local",
             "private_key" => env("CLOUDFRONT_PRIVATE_KEY", "private-key.pem"),
             "key_pair_id" => env("CLOUDFRONT_KEY_PAIR_ID"),
             "domain" => env("CLOUDFRONT_DOMAIN"),
+            "enabled" => env("CLOUDFRONT_ENABLED", false),
         ],
     ],
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Question;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -14,23 +15,28 @@ class QuestionResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        /** @var Question|QuestionResource $this */
+
         return [
             "id" => $this->id,
             "title" => $this->title,
-            "picture" => $this->picture,
+            "picture" => $this->getLink($this->picture),
             "type" => $this->type,
             "data" => $this->data,
             "answers" => $this->when(
                 $request->has("withAnswers"),
-                $this->correct_answers,
+                $this->getAnswers(),
             ),
-            "options" => $this->whenLoaded("options", function () {
-                return $this->options->mapWithKeys(
-                    fn($option) => [
-                        $option->order => OptionResource::make($option),
-                    ],
-                );
-            }),
+            "options" => $this->when(
+                $this->relationLoaded("options") && $this->type->showOptions(),
+                function () {
+                    return $this->options->mapWithKeys(
+                        fn($option) => [
+                            $option->order => OptionResource::make($option),
+                        ],
+                    );
+                },
+            ),
         ];
     }
 }

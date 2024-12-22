@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AllGamesController;
+use App\Http\Controllers\CheckQuestionController;
 use App\Http\Controllers\CurrentGameController;
 use App\Http\Controllers\EntityController;
 use App\Http\Controllers\GroupController;
@@ -20,4 +21,14 @@ Route::prefix("v1")
         Route::resource("quizzes", QuizController::class);
 
         Route::resource("entities", EntityController::class);
+
+        Route::get("questions/{question}/check", [
+            CheckQuestionController::class,
+            "show",
+        ]);
+
+        Route::get("quizzes/{quiz}/check", [
+            CheckQuestionController::class,
+            "index",
+        ]);
     });

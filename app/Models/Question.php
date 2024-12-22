@@ -29,6 +29,16 @@ class Question extends Model
         return $this->hasMany(Option::class)->orderBy("order");
     }
 
+    public function check(string|int|array $answer): bool
+    {
+        return $this->type->getChecker()->check($this, $answer);
+    }
+
+    public function getAnswers(): array|int|string
+    {
+        return $this->type->getChecker()->getCorrectAnswer($this);
+    }
+
     public static function calculateCorrectAnswers(
         QuestionType $type,
         array $options,
