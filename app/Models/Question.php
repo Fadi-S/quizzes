@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Filament\Forms;
+use Illuminate\Support\Collection;
 
 class Question extends Model
 {
@@ -23,6 +24,23 @@ class Question extends Model
     public function options(): HasMany
     {
         return $this->hasMany(Option::class);
+    }
+
+    public static function calculateCorrectAnswers(
+        QuestionType $type,
+        array $options,
+    ): Collection {
+        $correctAnswers = collect();
+        $order = 1;
+        foreach ($options as $option) {
+            if ($option["is_correct"]) {
+                $correctAnswers->push($order);
+            }
+
+            $order++;
+        }
+
+        return $correctAnswers;
     }
 
     public static function getForm(): array

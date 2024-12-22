@@ -2,7 +2,7 @@
 
 namespace App\Enums;
 
-enum QuestionType : int
+enum QuestionType: int
 {
     case Choose = 1;
     case Written = 2;
@@ -15,9 +15,17 @@ enum QuestionType : int
         return [
             self::Choose->value => "Choose",
             self::Written->value => "Written",
-//            self::Order->value => "Order",
-//            self::Match->value => "Match",
-//            self::Slider->value => "Slider",
+            //            self::Order->value => "Order",
+            //            self::Match->value => "Match",
+            //            self::Slider->value => "Slider",
         ];
+    }
+
+    public function showOptions(): bool
+    {
+        return match ($this) {
+            self::Choose, self::Order, self::Match => true,
+            self::Written, self::Slider => false,
+        };
     }
 }

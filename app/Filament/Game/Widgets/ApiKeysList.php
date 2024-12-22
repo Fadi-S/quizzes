@@ -40,7 +40,7 @@ class ApiKeysList extends BaseWidget
                         session()->flash("api-key-display-$apiKey", $secret);
                     }),
             ])
-            ->query(ApiKey::query()->latest())
+            ->query(ApiKey::query()->game()->latest())
             ->actions([
                 Tables\Actions\DeleteAction::make(
                     "delete",

@@ -8,6 +8,13 @@ use Illuminate\Http\Request;
 
 class QuizController extends Controller
 {
+    public function index()
+    {
+        return response()->json([
+            "quizzes" => QuizResource::collection(Quiz::all()),
+        ]);
+    }
+
     /**
      * Store a newly created resource in storage.
      */

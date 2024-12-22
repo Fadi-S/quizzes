@@ -39,6 +39,8 @@ class GroupController extends Controller
 
     public function show(Group $group)
     {
+        $group->load("quizzes");
+
         return response()->json(["group" => GroupResource::make($group)]);
     }
 

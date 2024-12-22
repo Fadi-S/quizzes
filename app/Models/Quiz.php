@@ -14,6 +14,20 @@ class Quiz extends Model
 {
     use HasRelationships;
 
+    protected static function booting()
+    {
+        static::addGlobalScope("game", function ($model) {
+            $model->whereRelation(
+                "group",
+                "game_id",
+                "=",
+                Game::current()?->id,
+            );
+        });
+
+        parent::booting();
+    }
+
     protected static function boot()
     {
         static::creating(function ($model) {
@@ -59,6 +73,13 @@ class Quiz extends Model
                         $set("slug", str($state)->slug(language: null));
                     }
                 })
+                ->unique(
+                    ignorable: fn($record) => $record ?? null,
+                    ignoreRecord: true,
+                    modifyRuleUsing: function ($rule, $get) {
+                        return $rule->where("group_id", $get("group_id"));
+                    },
+                )
                 ->required(),
 
             Forms\Components\TextInput::make("slug")->disabled(),
@@ -79,19 +100,21 @@ class Quiz extends Model
                 ->saveRelationshipsUsing(function (Quiz $record, $state) {
                     $allOptions = collect();
                     foreach ($state as $question) {
-                        $i = 1;
-                        $correctAnswers = collect();
                         $options = $question["options"];
+                        $question[
+                            "correct_answers"
+                        ] = Question::calculateCorrectAnswers(
+                            QuestionType::tryFrom($question["type"]),
+                            $options,
+                        );
+
                         unset($question["options"]);
+                        $order = 1;
                         foreach ($options as $key => $option) {
-                            $order = $i++;
-                            if ($option["is_correct"]) {
-                                $correctAnswers->push($order);
-                            }
                             unset($option["is_correct"]);
                             unset($option["id"]);
 
-                            $option["order"] = $order;
+                            $option["order"] = $order++;
                             $option["picture"] = collect(
                                 $option["picture"],
                             )->first();
@@ -99,7 +122,6 @@ class Quiz extends Model
                             $options[$key] = $option;
                         }
 
-                        $question["correct_answers"] = $correctAnswers->all();
                         $question["picture"] = collect(
                             $question["picture"],
                         )->first();
@@ -116,12 +138,12 @@ class Quiz extends Model
                             $question = $record->questions()->create($question);
                         }
 
-                        $options = collect($options)->map(function (
-                            $option,
-                        ) use ($question) {
-                            $option["question_id"] = $question->id;
-                            return $option;
-                        });
+                        $options = collect($options)->map(
+                            fn($option) => [
+                                ...$option,
+                                "question_id" => $question->id,
+                            ],
+                        );
 
                         $allOptions->push(...$options);
                     }

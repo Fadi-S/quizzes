@@ -14,6 +14,14 @@ class OptionResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            "id" => $this->id,
+            "name" => $this->name,
+            "picture" => $this->picture,
+
+            "question" => $this->whenLoaded("question", function () {
+                return QuestionResource::make($this->question);
+            }),
+        ];
     }
 }

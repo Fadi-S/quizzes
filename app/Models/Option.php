@@ -26,7 +26,7 @@ class Option extends Model
             Forms\Components\FileUpload::make("picture")
                 ->columnSpan(1)
                 ->visibility("public")
-                ->directory("questions")
+                ->directory("options")
                 ->image()
                 ->visible(
                     fn($get) => QuestionType::tryFrom($get("../../type")) !==

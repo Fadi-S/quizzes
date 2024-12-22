@@ -30,6 +30,11 @@ class ApiKey extends Model
         return $buf;
     }
 
+    public function scopeGame($query)
+    {
+        $query->where("game_id", Game::current()->id);
+    }
+
     public function game(): BelongsTo
     {
         return $this->belongsTo(Game::class);
