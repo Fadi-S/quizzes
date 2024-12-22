@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\QuestionType;
+use App\Traits\Linkable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -11,6 +12,8 @@ use Illuminate\Support\Collection;
 
 class Question extends Model
 {
+    use Linkable;
+
     protected $casts = [
         "correct_answers" => "json",
         "type" => QuestionType::class,
@@ -23,7 +26,7 @@ class Question extends Model
 
     public function options(): HasMany
     {
-        return $this->hasMany(Option::class);
+        return $this->hasMany(Option::class)->orderBy("order");
     }
 
     public static function calculateCorrectAnswers(

@@ -3,12 +3,15 @@
 namespace App\Models;
 
 use App\Enums\QuestionType;
+use App\Traits\Linkable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Filament\Forms;
 
 class Option extends Model
 {
+    use Linkable;
+
     public $timestamps = false;
 
     public function question(): BelongsTo

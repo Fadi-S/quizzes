@@ -20,7 +20,17 @@ class QuestionResource extends JsonResource
             "picture" => $this->picture,
             "type" => $this->type,
             "data" => $this->data,
-            "options" => OptionResource::collection($this->options),
+            "answers" => $this->when(
+                $request->has("withAnswers"),
+                $this->correct_answers,
+            ),
+            "options" => $this->whenLoaded("options", function () {
+                return $this->options->mapWithKeys(
+                    fn($option) => [
+                        $option->order => OptionResource::make($option),
+                    ],
+                );
+            }),
         ];
     }
 }
