@@ -19,6 +19,7 @@ Route::prefix("v1")
         Route::resource("groups", GroupController::class);
 
         Route::resource("quizzes", QuizController::class);
+        Route::get("quizzes/{group}/{slug}");
 
         Route::resource("entities", EntityController::class);
 

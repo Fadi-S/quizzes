@@ -15,17 +15,37 @@ class Group extends Model
         "data" => "json",
     ];
 
+    protected static function boot()
+    {
+        static::creating(function ($model) {
+            $model->slug = str($model->name)->slug(language: null);
+        });
+
+        parent::boot();
+    }
+
     public static function getForm(): array
     {
         return [
             Forms\Components\TextInput::make("name")
                 ->required()
+                ->afterStateUpdated(function (
+                    string $operation,
+                    $state,
+                    Forms\Set $set,
+                ) {
+                    if ($operation === "create") {
+                        $set("slug", str($state)->slug(language: null));
+                    }
+                })
                 ->unique(
                     modifyRuleUsing: fn($rule) => $rule->where(
                         "game_id",
                         Game::current()->id,
                     ),
                 ),
+
+            Forms\Components\TextInput::make("slug")->disabled(),
         ];
     }
 
