@@ -18,8 +18,8 @@ Route::prefix("v1")
 
         Route::resource("groups", GroupController::class);
 
-        Route::resource("quizzes", QuizController::class);
-        Route::get("quizzes/{group}/{slug}");
+        Route::resource("quizzes", QuizController::class)->except("show");
+        Route::get("quizzes/{group}/{slug}", [QuizController::class, "show"]);
 
         Route::resource("entities", EntityController::class);
 

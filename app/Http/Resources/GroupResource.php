@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Group;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -14,9 +15,12 @@ class GroupResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        /** @var Group|GroupResource $this */
+
         return [
             "id" => $this->id,
             "name" => $this->name,
+            "slug" => $this->slug,
             "data" => $this->data,
 
             "game" => $this->whenLoaded(

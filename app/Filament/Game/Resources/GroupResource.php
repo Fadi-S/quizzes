@@ -31,6 +31,8 @@ class GroupResource extends Resource
                 Tables\Columns\TextColumn::make("name")
                     ->searchable()
                     ->sortable(),
+
+                Tables\Columns\TextColumn::make("slug"),
             ])
             ->filters([
                 //
