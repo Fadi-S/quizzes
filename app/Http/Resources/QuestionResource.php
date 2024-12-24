@@ -34,11 +34,7 @@ class QuestionResource extends JsonResource
                         return [];
                     }
 
-                    return $this->options->mapWithKeys(
-                        fn($option) => [
-                            $option->order => OptionResource::make($option),
-                        ],
-                    );
+                    return OptionResource::collection($this->options);
                 },
             ),
         ];
