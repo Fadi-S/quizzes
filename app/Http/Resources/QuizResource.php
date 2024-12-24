@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Quiz;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -14,9 +15,12 @@ class QuizResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        /* @var Quiz|self $this */
+
         return [
             "id" => $this->id,
             "name" => $this->name,
+            "slug" => $this->slug,
             "group_id" => $this->group_id,
             "data" => $this->data,
 
