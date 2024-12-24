@@ -31,9 +31,8 @@ class QuizController extends Controller
         $quiz = Quiz::query()
             ->whereRelation("group", "slug", "=", $group)
             ->where("slug", $slug)
+            ->with("questions.options")
             ->firstOrFail();
-
-        $quiz->load("questions.options");
 
         return response()->json([
             "quiz" => QuizResource::make($quiz),

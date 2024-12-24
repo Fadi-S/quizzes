@@ -27,26 +27,32 @@ class AdminPanelProvider extends PanelProvider
     {
         return $panel
             ->default()
-            ->id('admin')
-            ->path('admin')
+            ->profile(isSimple: false)
+            ->id("admin")
+            ->path("admin")
             ->login()
             ->colors([
-                'primary' => Color::Blue,
+                "primary" => Color::Blue,
             ])
-            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
-            ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
-            ->pages([
-                Pages\Dashboard::class,
-            ])
+            ->discoverResources(
+                in: app_path("Filament/Resources"),
+                for: "App\\Filament\\Resources",
+            )
+            ->discoverPages(
+                in: app_path("Filament/Pages"),
+                for: "App\\Filament\\Pages",
+            )
+            ->pages([Pages\Dashboard::class])
             ->navigationItems([
-                NavigationItem::make('Manage')
-                    ->icon('heroicon-o-cog-6-tooth')
-                    ->url('/game'),
+                NavigationItem::make("Manage")
+                    ->icon("heroicon-o-cog-6-tooth")
+                    ->url("/game"),
             ])
-            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
-            ->widgets([
-                Widgets\AccountWidget::class,
-            ])
+            ->discoverWidgets(
+                in: app_path("Filament/Widgets"),
+                for: "App\\Filament\\Widgets",
+            )
+            ->widgets([Widgets\AccountWidget::class])
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
@@ -58,9 +64,10 @@ class AdminPanelProvider extends PanelProvider
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
             ])
-            ->renderHook('panels::body.end', fn (): string => Blade::render("@vite('resources/js/app.js')"))
-            ->authMiddleware([
-                Authenticate::class,
-            ]);
+            ->renderHook(
+                "panels::body.end",
+                fn(): string => Blade::render("@vite('resources/js/app.js')"),
+            )
+            ->authMiddleware([Authenticate::class]);
     }
 }

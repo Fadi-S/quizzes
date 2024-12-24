@@ -30,6 +30,7 @@ class GamePanelProvider extends PanelProvider
     {
         return $panel
             ->login()
+            ->profile()
             ->id("game")
             ->path("game")
             ->colors([
