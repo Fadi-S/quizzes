@@ -28,8 +28,12 @@ class QuestionResource extends JsonResource
                 $this->getAnswers(),
             ),
             "options" => $this->when(
-                $this->relationLoaded("options") && $this->type->showOptions(),
+                $this->relationLoaded("options"),
                 function () {
+                    if (!$this->type->showOptions()) {
+                        return [];
+                    }
+
                     return $this->options->mapWithKeys(
                         fn($option) => [
                             $option->order => OptionResource::make($option),
