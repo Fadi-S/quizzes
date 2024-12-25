@@ -10,6 +10,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -36,6 +37,10 @@ class QuizResource extends Resource
                     ->label("Group")
                     ->searchable()
                     ->sortable(),
+
+                Tables\Columns\TextColumn::make("questions_count")
+                    ->label("# Questions")
+                    ->sortable(),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make("group_id")
@@ -52,9 +57,12 @@ class QuizResource extends Resource
 
     public static function getRelations(): array
     {
-        return [
-                //
-            ];
+        return [];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->withCount("questions");
     }
 
     public static function getPages(): array
