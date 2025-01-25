@@ -29,13 +29,9 @@ class QuestionResource extends JsonResource
             ),
             "options" => $this->when(
                 $this->relationLoaded("options"),
-                function () {
-                    if (!$this->type->showOptions()) {
-                        return [];
-                    }
-
-                    return OptionResource::collection($this->options);
-                },
+                fn() => OptionResource::collection(
+                    $this->options_with_correct_order,
+                ),
             ),
         ];
     }

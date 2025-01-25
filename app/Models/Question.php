@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Filament\Forms;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Enumerable;
 
 class Question extends Model
 {
@@ -46,7 +47,7 @@ class Question extends Model
         $correctAnswers = collect();
         $order = 1;
         foreach ($options as $option) {
-            if ($option["is_correct"]) {
+            if ($type === QuestionType::Order || $option["is_correct"]) {
                 $correctAnswers->push($order);
             }
 
@@ -54,6 +55,19 @@ class Question extends Model
         }
 
         return $correctAnswers;
+    }
+
+    public function getOptionsWithCorrectOrderAttribute(): Collection
+    {
+        if (!$this->type->showOptions()) {
+            return collect();
+        }
+
+        if ($this->type === QuestionType::Order) {
+            return $this->options->shuffle();
+        }
+
+        return $this->options->sortBy("order");
     }
 
     public static function getForm(): array

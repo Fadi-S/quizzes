@@ -26,6 +26,6 @@ readonly class Order implements CheckQuestion
 
     public function getCorrectAnswer(Question $question): string|int|array
     {
-        // TODO: Implement getCorrectAnswer() method.
+        return $question->correct_answers;
     }
 }

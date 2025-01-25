@@ -21,6 +21,8 @@ namespace App\Models{
  * @property string $secret
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Game $game
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ApiKey game()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApiKey newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApiKey newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApiKey query()
@@ -44,6 +46,8 @@ namespace App\Models{
  * @property string|null $data
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Game|null $game
+ * @property-read \App\Models\Group $group
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Entity newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Entity newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Entity query()
@@ -90,6 +94,7 @@ namespace App\Models{
  *
  * @property int $id
  * @property string $name
+ * @property string|null $color
  * @property string $slug
  * @property string|null $picture
  * @property string|null $data
@@ -97,9 +102,16 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ApiKey> $apiKeys
  * @property-read int|null $api_keys_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Entity> $entities
+ * @property-read int|null $entities_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Group> $groups
+ * @property-read int|null $groups_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Quiz> $quizzes
+ * @property-read int|null $quizzes_count
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Game newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Game newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Game query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Game whereColor($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Game whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Game whereData($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Game whereId($value)
@@ -118,9 +130,13 @@ namespace App\Models{
  * @property int $id
  * @property int $game_id
  * @property string $name
- * @property string|null $data
+ * @property string|null $slug
+ * @property array|null $data
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Game $game
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Quiz> $quizzes
+ * @property-read int|null $quizzes_count
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Group newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Group newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Group query()
@@ -129,6 +145,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Group whereGameId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Group whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Group whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Group whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Group whereUpdatedAt($value)
  */
 	class Group extends \Eloquent {}
@@ -143,6 +160,7 @@ namespace App\Models{
  * @property string $name
  * @property int $order
  * @property string|null $picture
+ * @property-read \App\Models\Question $question
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Option newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Option newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Option query()
@@ -162,18 +180,25 @@ namespace App\Models{
  * @property int $id
  * @property int $quiz_id
  * @property string $title
- * @property int $type
- * @property string $correct_answers
+ * @property \App\Enums\QuestionType $type
+ * @property array $correct_answers
  * @property string|null $picture
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property string|null $data
+ * @property int|null $points
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Option> $options
+ * @property-read int|null $options_count
+ * @property-read \App\Models\Quiz $quiz
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Question newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Question newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Question query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Question whereCorrectAnswers($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Question whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Question whereData($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Question whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Question wherePicture($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Question wherePoints($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Question whereQuizId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Question whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Question whereType($value)
@@ -189,9 +214,14 @@ namespace App\Models{
  * @property int $id
  * @property int $group_id
  * @property string $name
+ * @property string $slug
  * @property string|null $data
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Game|null $game
+ * @property-read \App\Models\Group $group
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Question> $questions
+ * @property-read int|null $questions_count
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Quiz newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Quiz newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Quiz query()
@@ -200,6 +230,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Quiz whereGroupId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Quiz whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Quiz whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Quiz whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Quiz whereUpdatedAt($value)
  */
 	class Quiz extends \Eloquent {}
@@ -218,7 +249,7 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property string $role
- * @property string|null $games
+ * @property array|null $games
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
  * @property-read int|null $notifications_count
  * @method static \Database\Factories\UserFactory factory($count = null, $state = [])
@@ -236,6 +267,6 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereRole($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereUpdatedAt($value)
  */
-	class User extends \Eloquent implements \Filament\Models\Contracts\FilamentUser {}
+	class User extends \Eloquent implements \Filament\Models\Contracts\FilamentUser, \Filament\Models\Contracts\HasTenants {}
 }
 

@@ -17,7 +17,7 @@ enum QuestionType: int
         return [
             self::Choose->value => "Choose",
             self::Written->value => "Written",
-            //            self::Order->value => "Order",
+            self::Order->value => "Order",
             //            self::Match->value => "Match",
             //            self::Slider->value => "Slider",
         ];
