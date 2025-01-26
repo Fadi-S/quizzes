@@ -11,11 +11,7 @@ class EntityQuestion extends Model
 
     public function question(): BelongsTo
     {
-        return $this->belongsTo(Question::class)->withPivot(
-            "answer",
-            "points",
-            "is_correct",
-        );
+        return $this->belongsTo(Question::class);
     }
 
     public function entity(): BelongsTo

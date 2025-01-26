@@ -14,11 +14,10 @@ class SubmitQuizGuestController extends Controller
 {
     public function __invoke($group, $slug, Request $request)
     {
-        $quiz = Quiz::query()
-            ->whereRelation("group", "slug", "=", $group)
-            ->where("slug", $slug)
-            ->with("questions.options")
-            ->firstOrFail();
+        $quiz = Quiz::fromGroupAndSlug($group, $slug);
+        if (!$quiz) {
+            abort(404);
+        }
 
         $group = Group::where("slug", $group)->firstOrFail();
         $entity = Entity::createGuest($group);

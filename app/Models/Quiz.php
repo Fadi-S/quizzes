@@ -39,6 +39,15 @@ class Quiz extends Model
         parent::boot();
     }
 
+    public static function fromGroupAndSlug($group, $quizSlug): ?self
+    {
+        return Quiz::query()
+            ->whereRelation("group", "slug", "=", $group)
+            ->where("slug", $quizSlug)
+            ->with("questions.options")
+            ->first();
+    }
+
     public function correct($questions): QuizResponse
     {
         $this->load("questions.options");
@@ -86,9 +95,9 @@ class Quiz extends Model
         return $this->hasMany(Question::class)->with("options");
     }
 
-    public function entities(): HasMany
+    public function responses(): HasMany
     {
-        return $this->hasMany(EntityQuiz::class)->with("points");
+        return $this->hasMany(EntityQuiz::class);
     }
 
     public static function getForm(): array

@@ -73,11 +73,7 @@ class Question extends Model
 
     public function responses(): HasMany
     {
-        return $this->hasMany(EntityQuestion::class)->withPivot(
-            "answer",
-            "is_correct",
-            "points",
-        );
+        return $this->hasMany(EntityQuestion::class);
     }
 
     public static function getForm(): array

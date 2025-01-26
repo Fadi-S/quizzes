@@ -21,6 +21,7 @@ namespace App\Models{
  * @property string $secret
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property \App\Enums\ApiKeyRole $role
  * @property-read \App\Models\Game $game
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApiKey game()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApiKey newModelQuery()
@@ -30,6 +31,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApiKey whereGameId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApiKey whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApiKey whereKey($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ApiKey whereRole($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApiKey whereSecret($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApiKey whereUpdatedAt($value)
  */
@@ -72,6 +74,7 @@ namespace App\Models{
  * @property int $is_correct
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property int $points
  * @property-read \App\Models\Entity $entity
  * @property-read \App\Models\Question $question
  * @method static \Illuminate\Database\Eloquent\Builder<static>|EntityQuestion newModelQuery()
@@ -82,6 +85,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|EntityQuestion whereEntityId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|EntityQuestion whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|EntityQuestion whereIsCorrect($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|EntityQuestion wherePoints($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|EntityQuestion whereQuestionId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|EntityQuestion whereUpdatedAt($value)
  */
@@ -92,11 +96,25 @@ namespace App\Models{
 /**
  * 
  *
- * @property-read \App\Models\Entity|null $entity
- * @property-read \App\Models\Quiz|null $quiz
+ * @property int $id
+ * @property int $entity_id
+ * @property int $quiz_id
+ * @property int $points
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\EntityQuestion> $answers
+ * @property-read int|null $answers_count
+ * @property-read \App\Models\Entity $entity
+ * @property-read \App\Models\Quiz $quiz
  * @method static \Illuminate\Database\Eloquent\Builder<static>|EntityQuiz newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|EntityQuiz newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|EntityQuiz query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|EntityQuiz whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|EntityQuiz whereEntityId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|EntityQuiz whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|EntityQuiz wherePoints($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|EntityQuiz whereQuizId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|EntityQuiz whereUpdatedAt($value)
  */
 	class EntityQuiz extends \Eloquent {}
 }
@@ -204,6 +222,8 @@ namespace App\Models{
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Option> $options
  * @property-read int|null $options_count
  * @property-read \App\Models\Quiz $quiz
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\EntityQuestion> $responses
+ * @property-read int|null $responses_count
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Question newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Question newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Question query()
@@ -232,12 +252,12 @@ namespace App\Models{
  * @property string|null $data
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\EntityQuiz> $entities
- * @property-read int|null $entities_count
  * @property-read \App\Models\Game|null $game
  * @property-read \App\Models\Group $group
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Question> $questions
  * @property-read int|null $questions_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\EntityQuiz> $responses
+ * @property-read int|null $responses_count
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Quiz newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Quiz newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Quiz query()

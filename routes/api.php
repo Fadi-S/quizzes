@@ -6,6 +6,7 @@ use App\Http\Controllers\CurrentGameController;
 use App\Http\Controllers\EntityController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\QuizController;
+use App\Http\Controllers\QuizResponseController;
 use App\Http\Controllers\User\SubmitQuizGuestController;
 use App\Http\Middleware\EnsureApiKeyIsValid;
 use App\Http\Middleware\EnsureApiKeyIsValidForAdmin;
@@ -21,6 +22,11 @@ Route::prefix("v1")
         Route::resource("groups", GroupController::class);
 
         Route::resource("quizzes", QuizController::class)->except("show");
+
+        Route::get(
+            "quizzes/{group}/{slug}/responses",
+            QuizResponseController::class,
+        );
 
         Route::resource("entities", EntityController::class);
 
