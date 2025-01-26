@@ -22,7 +22,7 @@ class Entity extends Model
         ];
     }
 
-    public static function createGuest(int $group): self
+    public static function createGuest($group): self
     {
         $faker = Faker::create();
 
