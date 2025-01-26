@@ -21,10 +21,6 @@ Route::prefix("v1")
 
         Route::resource("quizzes", QuizController::class)->except("show");
         Route::get("quizzes/{group}/{slug}", [QuizController::class, "show"]);
-        Route::post(
-            "quizzes/{group}/{slug}/submit",
-            SubmitQuizGuestController::class,
-        );
 
         Route::resource("entities", EntityController::class);
 
@@ -38,3 +34,10 @@ Route::prefix("v1")
             "index",
         ]);
     });
+
+Route::prefix("v1")->group(function () {
+    Route::post(
+        "quizzes/{group}/{slug}/submit",
+        SubmitQuizGuestController::class,
+    );
+});
