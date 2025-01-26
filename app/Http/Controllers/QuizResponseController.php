@@ -26,6 +26,7 @@ class QuizResponseController extends Controller
             $responses[$response->entity_id] = [
                 "entity" => EntityResource::make($response->entity),
                 "answers" => [],
+                "points" => $response->points,
             ];
 
             foreach ($quiz->questions as $question) {
@@ -33,6 +34,7 @@ class QuizResponseController extends Controller
 
                 $responses[$response->entity_id]["answers"][$question->id] = [
                     "answer" => $answer?->answer,
+                    "points" => $answer?->points ?? 0,
                     "is_correct" => $answer?->is_correct ?? false,
                 ];
             }

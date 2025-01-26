@@ -9,6 +9,10 @@ class EntityQuestion extends Model
 {
     protected $table = "entity_question";
 
+    protected $casts = [
+        "answer" => "json",
+    ];
+
     public function question(): BelongsTo
     {
         return $this->belongsTo(Question::class);
