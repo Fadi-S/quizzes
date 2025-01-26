@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Filament\Forms;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
-use Faker\Factory as Faker;
+use Illuminate\Support\Str;
 
 class Entity extends Model
 {
@@ -24,10 +24,8 @@ class Entity extends Model
 
     public static function createGuest($group): self
     {
-        $faker = Faker::create();
-
         return self::create([
-            "name" => "Guest " . $faker->name,
+            "name" => "Guest " . Str::random(6),
             "group_id" => $group,
         ]);
     }
