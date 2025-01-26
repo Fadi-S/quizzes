@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\ApiKeyRole;
 use App\Traits\Linkable;
 use Filament\Facades\Filament;
 use Illuminate\Database\Eloquent\Model;
@@ -47,7 +48,7 @@ class Game extends Model
         return $this->hasManyThrough(Quiz::class, Group::class);
     }
 
-    public function createAPIKey(): array
+    public function createAPIKey($role = ApiKeyRole::Admin): array
     {
         $key = ApiKey::generate();
         $secret = ApiKey::generate(64);
@@ -55,27 +56,21 @@ class Game extends Model
         $this->apiKeys()->create([
             "key" => $key,
             "secret" => Hash::make($secret),
+            "role" => $role,
         ]);
 
         return [
             "key" => $key,
             "secret" => $secret,
+            "role" => $role,
         ];
     }
 
     public static function current(): ?self
     {
-        if ($auth = request()->header("Authorization")) {
-            $auth = base64_decode(str_replace("Basic ", "", $auth));
-            $auth = explode(":", $auth);
-            $apiKey = ApiKey::query()
-                ->where("key", "=", $auth[0] ?? "")
-                ->with("game")
-                ->first();
-
-            if ($apiKey && Hash::check($auth[1] ?? "", $apiKey->secret)) {
-                return $apiKey->game;
-            }
+        $apiKey = ApiKey::current();
+        if ($apiKey) {
+            return $apiKey->game;
         }
 
         $id = auth()->id();

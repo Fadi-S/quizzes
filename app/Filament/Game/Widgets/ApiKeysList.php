@@ -2,6 +2,7 @@
 
 namespace App\Filament\Game\Widgets;
 
+use App\Enums\ApiKeyRole;
 use App\Models\ApiKey;
 use App\Models\Game;
 use Filament\Actions\Action;
@@ -20,14 +21,33 @@ class ApiKeysList extends BaseWidget
         return $table
             ->headerActions([
                 Tables\Actions\Action::make("generate")
-                    ->label("Generate API Key")
-
+                    ->label("Generate Admin API Key")
                     ->icon("heroicon-o-key")
                     ->action(function () {
                         [
                             "key" => $apiKey,
                             "secret" => $secret,
-                        ] = Game::current()->createAPIKey();
+                        ] = Game::current()->createAPIKey(ApiKeyRole::Admin);
+
+                        Notification::make()
+                            ->success()
+                            ->title("API Key Generated")
+                            ->body(
+                                "Make sure to copy the secret, it won't be shown again.",
+                            )
+                            ->send();
+
+                        session()->flash("api-key-display-$apiKey", $secret);
+                    }),
+
+                Tables\Actions\Action::make("generate-user")
+                    ->label("Generate User API Key")
+                    ->icon("heroicon-o-key")
+                    ->action(function () {
+                        [
+                            "key" => $apiKey,
+                            "secret" => $secret,
+                        ] = Game::current()->createAPIKey(ApiKeyRole::User);
 
                         Notification::make()
                             ->success()
@@ -53,6 +73,7 @@ class ApiKeysList extends BaseWidget
             ])
             ->columns([
                 Tables\Columns\TextColumn::make("key")->copyable(),
+                Tables\Columns\TextColumn::make("role"),
                 Tables\Columns\TextColumn::make("secret")
                     ->copyable(
                         fn(ApiKey $record) => (bool) session(
