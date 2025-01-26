@@ -16,6 +16,10 @@ class Quiz extends Model
 {
     use HasRelationships;
 
+    protected $casts = [
+        "data" => "json",
+    ];
+
     protected static function booting()
     {
         static::addGlobalScope("game", function ($model) {
