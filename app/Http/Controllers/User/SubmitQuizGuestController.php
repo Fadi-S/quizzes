@@ -32,7 +32,7 @@ class SubmitQuizGuestController extends Controller
             $entityQuestions[] = [
                 "question_id" => $questionId,
                 "entity_id" => $entity->id,
-                "answer" => $response->response,
+                "answer" => json_encode($response->response),
                 "points" => $response->points,
                 "is_correct" => $response->isCorrect,
             ];
