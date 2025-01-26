@@ -22,11 +22,11 @@ class Entity extends Model
         ];
     }
 
-    public static function createGuest($group): self
+    public static function createGuest(Group $group): self
     {
         return self::create([
             "name" => "Guest " . Str::random(6),
-            "group_id" => $group,
+            "group_id" => $group->id,
         ]);
     }
 

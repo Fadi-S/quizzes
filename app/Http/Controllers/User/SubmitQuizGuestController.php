@@ -20,6 +20,7 @@ class SubmitQuizGuestController extends Controller
             ->with("questions.options")
             ->firstOrFail();
 
+        $group = Group::where("slug", $group)->firstOrFail();
         $entity = Entity::createGuest($group);
 
         \DB::beginTransaction();
