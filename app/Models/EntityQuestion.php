@@ -7,14 +7,18 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class EntityQuestion extends Model
 {
-    protected $table = 'entity_question';
+    protected $table = "entity_question";
 
-    public function question() : BelongsTo
+    public function question(): BelongsTo
     {
-        return $this->belongsTo(Question::class);
+        return $this->belongsTo(Question::class)->withPivot(
+            "answer",
+            "points",
+            "is_correct",
+        );
     }
 
-    public function entity() : BelongsTo
+    public function entity(): BelongsTo
     {
         return $this->belongsTo(Entity::class);
     }

@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Enums\QuestionType;
+use App\Questions\QuestionResponse;
+use App\Questions\QuizResponse;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -37,6 +39,31 @@ class Quiz extends Model
         parent::boot();
     }
 
+    public function correct($questions): QuizResponse
+    {
+        $this->load("questions.options");
+
+        $points = 0;
+        $answers = [];
+        $responses = [];
+
+        foreach ($this->questions as $question) {
+            $answers[$question->id] = $question->getAnswers();
+
+            if (!isset($questions[$question->id])) {
+                $responses[$question->id] = QuestionResponse::noResponse();
+                continue;
+            }
+
+            $answer = $questions[$question->id];
+            $responses[$question->id] = $question->check($answer);
+
+            $points += $responses[$question->id]->points;
+        }
+
+        return new QuizResponse($points, $responses, $answers);
+    }
+
     public function group(): BelongsTo
     {
         return $this->belongsTo(Group::class);
@@ -57,6 +84,11 @@ class Quiz extends Model
     public function questions(): HasMany
     {
         return $this->hasMany(Question::class)->with("options");
+    }
+
+    public function entities(): HasMany
+    {
+        return $this->hasMany(EntityQuiz::class)->with("points");
     }
 
     public static function getForm(): array

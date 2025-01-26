@@ -92,6 +92,19 @@ namespace App\Models{
 /**
  * 
  *
+ * @property-read \App\Models\Entity|null $entity
+ * @property-read \App\Models\Quiz|null $quiz
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|EntityQuiz newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|EntityQuiz newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|EntityQuiz query()
+ */
+	class EntityQuiz extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * 
+ *
  * @property int $id
  * @property string $name
  * @property string|null $color
@@ -187,6 +200,7 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property string|null $data
  * @property int|null $points
+ * @property-read \Illuminate\Support\Collection $options_with_correct_order
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Option> $options
  * @property-read int|null $options_count
  * @property-read \App\Models\Quiz $quiz
@@ -218,6 +232,8 @@ namespace App\Models{
  * @property string|null $data
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\EntityQuiz> $entities
+ * @property-read int|null $entities_count
  * @property-read \App\Models\Game|null $game
  * @property-read \App\Models\Group $group
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Question> $questions

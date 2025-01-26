@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Filament\Forms;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
+use Faker\Factory as Faker;
 
 class Entity extends Model
 {
@@ -19,6 +20,16 @@ class Entity extends Model
                 ->label("Group")
                 ->required(),
         ];
+    }
+
+    public static function createGuest(int $group): self
+    {
+        $faker = Faker::create();
+
+        return self::create([
+            "name" => "Guest " . $faker->name,
+            "group_id" => $group,
+        ]);
     }
 
     public function group(): BelongsTo

@@ -10,36 +10,11 @@ class CheckQuestionController extends Controller
 {
     public function index(Request $request, Quiz $quiz)
     {
-        $points = 0;
-
         $questions = $request->get("questions");
-        $checks = [];
-        $answers = [];
-        foreach ($quiz->questions as $question) {
-            if (!isset($questions[$question->id])) {
-                $checks[$question->id] = false;
-                continue;
-            }
+        $data = $quiz->correct($questions)->toArray();
 
-            $answer = $questions[$question->id];
-
-            $check = $question->check($answer);
-            $answers[$question->id] = $question->getAnswers();
-
-            $checks[$question->id] = $check;
-
-            if ($check) {
-                $points += $question->points;
-            }
-        }
-
-        $data = [
-            "points" => $points,
-            "correct" => $checks,
-        ];
-
-        if ($request->has("withAnswers")) {
-            $data["correct_answers"] = $answers;
+        if (!$request->has("withAnswers")) {
+            unset($data["correct_answers"]);
         }
 
         return $data;

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\QuestionType;
+use App\Questions\QuestionResponse;
 use App\Traits\Linkable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -30,7 +31,7 @@ class Question extends Model
         return $this->hasMany(Option::class)->orderBy("order");
     }
 
-    public function check(string|int|array $answer): bool
+    public function check(string|int|array $answer): QuestionResponse
     {
         return $this->type->getChecker()->check($this, $answer);
     }
@@ -68,6 +69,15 @@ class Question extends Model
         }
 
         return $this->options->sortBy("order");
+    }
+
+    public function responses(): HasMany
+    {
+        return $this->hasMany(EntityQuestion::class)->withPivot(
+            "answer",
+            "is_correct",
+            "points",
+        );
     }
 
     public static function getForm(): array
