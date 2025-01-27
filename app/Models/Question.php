@@ -104,17 +104,16 @@ class Question extends Model
                 ->relationship()
                 ->minItems(function ($get) {
                     $type = QuestionType::tryFrom($get("type"));
-                    return $type === QuestionType::Choose ? 2 : 1;
+                    return $type->minOptionsRequired();
                 })
                 ->maxItems(function ($get) {
                     $type = QuestionType::tryFrom($get("type"));
-                    return $type === QuestionType::Written ? null : 6;
+                    return $type->maxOptionsRequired();
                 })
                 ->defaultItems(
-                    fn($get) => QuestionType::tryFrom($get("type")) ===
-                    QuestionType::Written
-                        ? 1
-                        : 2,
+                    fn($get) => QuestionType::tryFrom(
+                        $get("type"),
+                    )->defaultOptions(),
                 )
                 ->orderColumn("order")
                 ->itemLabel(fn($state) => $state["name"] ?? "...")
