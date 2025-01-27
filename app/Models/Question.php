@@ -90,9 +90,6 @@ class Question extends Model
             Forms\Components\Radio::make("type")
                 ->live()
                 ->columns(3)
-                ->disabled(
-                    fn(?Model $record) => $record !== null && $record->exists,
-                )
                 ->options(QuestionType::toArray())
                 ->required(),
 
