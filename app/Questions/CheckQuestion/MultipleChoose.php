@@ -19,6 +19,14 @@ readonly class MultipleChoose implements CheckQuestion
         $correctAnswers = collect($question->correct_answers);
 
         $totalCorrectCount = $correctAnswers->count();
+        if ($totalCorrectCount === 0) {
+            return new QuestionResponse(
+                points: 0,
+                response: $answer,
+                isCorrect: false,
+            );
+        }
+
         $correctCount = $correctAnswers->intersect($answer)->count();
         $points = ($correctCount / $totalCorrectCount) * $question->points;
 
