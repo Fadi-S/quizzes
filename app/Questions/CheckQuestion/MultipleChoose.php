@@ -22,7 +22,7 @@ readonly class MultipleChoose implements CheckQuestion
         if ($totalCorrectCount === 0) {
             return new QuestionResponse(
                 points: 0,
-                response: $answer,
+                response: $answer->toArray(),
                 isCorrect: false,
             );
         }
@@ -34,7 +34,7 @@ readonly class MultipleChoose implements CheckQuestion
 
         return new QuestionResponse(
             points: $check ? $points : 0,
-            response: $answer,
+            response: $answer->toArray(),
             isCorrect: $check,
         );
     }
