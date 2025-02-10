@@ -144,6 +144,8 @@ class Quiz extends Model
                 ->defaultItems(0)
                 ->saveRelationshipsUsing(function (Quiz $record, $state) {
                     $allOptions = collect();
+
+                    $questionIdsInState = collect();
                     foreach ($state as $question) {
                         $options = $question["options"];
                         $question[
@@ -183,6 +185,8 @@ class Quiz extends Model
                             $question = $record->questions()->create($question);
                         }
 
+                        $questionIdsInState->push($question->id);
+
                         $options = collect($options)->map(
                             fn($option) => [
                                 ...$option,
@@ -198,6 +202,11 @@ class Quiz extends Model
                         ["name", "question_id"],
                         ["name", "picture", "order"],
                     );
+
+                    $record
+                        ->questions()
+                        ->whereNotIn("id", $questionIdsInState)
+                        ->delete();
                 })
                 ->schema(Question::getForm()),
         ];
