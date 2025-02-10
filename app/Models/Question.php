@@ -113,7 +113,7 @@ class Question extends Model
                 ->defaultItems(
                     fn($get) => QuestionType::tryFrom(
                         $get("type"),
-                    )->defaultOptions(),
+                    )?->defaultOptions(),
                 )
                 ->orderColumn("order")
                 ->itemLabel(fn($state) => $state["name"] ?? "...")
