@@ -44,8 +44,9 @@ class Option extends Model
                     $set("is_correct", $answers->contains($get("order")));
                 })
                 ->visible(
-                    fn($get) => QuestionType::tryFrom($get("../../type")) ===
-                        QuestionType::Choose,
+                    fn($get) => QuestionType::tryFrom(
+                        $get("../../type"),
+                    )?->showIsCorrect() ?? false,
                 ),
         ];
     }

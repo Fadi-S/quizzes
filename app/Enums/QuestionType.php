@@ -49,6 +49,14 @@ enum QuestionType: int
         };
     }
 
+    public function showIsCorrect(): bool
+    {
+        return match ($this) {
+            self::Choose, self::MultipleChoose => true,
+            default => false,
+        };
+    }
+
     public function minOptionsRequired(): ?int
     {
         return match ($this) {
