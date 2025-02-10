@@ -49,7 +49,7 @@ enum QuestionType: int
         };
     }
 
-    public function minOptionsRequired(): int
+    public function minOptionsRequired(): ?int
     {
         return match ($this) {
             self::Choose, self::Order, self::Match, self::MultipleChoose => 2,
@@ -57,7 +57,7 @@ enum QuestionType: int
         };
     }
 
-    public function maxOptionsRequired(): int
+    public function maxOptionsRequired(): ?int
     {
         return match ($this) {
             self::Choose, self::Order, self::Match, self::MultipleChoose => 10,
