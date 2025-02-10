@@ -102,14 +102,16 @@ class Question extends Model
             Forms\Components\Repeater::make("options")
                 ->grid()
                 ->relationship()
-                ->minItems(function ($get) {
-                    $type = QuestionType::tryFrom($get("type"));
-                    return $type->minOptionsRequired();
-                })
-                ->maxItems(function ($get) {
-                    $type = QuestionType::tryFrom($get("type"));
-                    return $type->maxOptionsRequired();
-                })
+                ->minItems(
+                    fn($get) => QuestionType::tryFrom(
+                        $get("type"),
+                    )?->minOptionsRequired(),
+                )
+                ->maxItems(
+                    fn($get) => QuestionType::tryFrom(
+                        $get("type"),
+                    )?->maxOptionsRequired(),
+                )
                 ->defaultItems(
                     fn($get) => QuestionType::tryFrom(
                         $get("type"),
