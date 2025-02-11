@@ -22,7 +22,10 @@ class SubmitQuizController extends Controller
             abort(404);
         }
 
-        $entity = Entity::findOrFail($entity);
+        $entity = Entity::query()
+            ->where("group_id", "=", $quiz->group_id)
+            ->where("id", "=", $entity)
+            ->firstOrFail();
 
         $exists = EntityQuiz::query()
             ->where("entity_id", $entity->id)
