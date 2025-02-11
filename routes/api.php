@@ -7,6 +7,7 @@ use App\Http\Controllers\EntityController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\QuizResponseController;
+use App\Http\Controllers\SubmitQuizController;
 use App\Http\Controllers\User\SubmitQuizGuestController;
 use App\Http\Middleware\EnsureApiKeyIsValid;
 use App\Http\Middleware\EnsureApiKeyIsValidForAdmin;
@@ -39,6 +40,11 @@ Route::prefix("v1")
             CheckQuestionController::class,
             "index",
         ]);
+
+        Route::post(
+            "quizzes/{group}/{slug}/{entity}/submit",
+            SubmitQuizController::class,
+        );
     });
 
 Route::prefix("v1")
