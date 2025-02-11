@@ -55,6 +55,8 @@ class EntityController extends Controller
      */
     public function show(Entity $entity)
     {
+        $entity->load("group");
+
         return [
             "entity" => new EntityResource($entity),
         ];
