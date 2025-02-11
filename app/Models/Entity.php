@@ -20,6 +20,8 @@ class Entity extends Model
 
             $query->whereRelation("group", "game_id", $game->id);
         });
+
+        parent::boot();
     }
 
     public static function getForm(): array
