@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\EntityResource;
+use App\Models\Entity;
+use App\Models\Group;
 use Illuminate\Http\Request;
 
 class EntityController extends Controller
@@ -9,17 +12,22 @@ class EntityController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
-    }
+        $group = Group::query()
+            ->where("slug", "=", $request->get("group"))
+            ->first();
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        return [
+            "entities" => EntityResource::collection(
+                Entity::query()
+                    ->when(
+                        $group,
+                        fn($query) => $query->where("group_id", $group->id),
+                    )
+                    ->get(),
+            ),
+        ];
     }
 
     /**
@@ -27,38 +35,53 @@ class EntityController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $group = Group::query()
+            ->where("slug", $request->get("group"))
+            ->firstOrFail();
+
+        $entity = Entity::query()->create([
+            "group_id" => $group->id,
+            "name" => $request->get("name"),
+            "data" => $request->get("data"),
+        ]);
+
+        return [
+            "entity" => new EntityResource($entity),
+        ];
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Entity $entity)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
+        return [
+            "entity" => new EntityResource($entity),
+        ];
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Entity $entity)
     {
-        //
+        $entity->update([
+            "name" => $request->get("name"),
+            "data" => $request->get("data"),
+        ]);
+
+        return [
+            "entity" => new EntityResource($entity),
+        ];
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Entity $entity)
     {
-        //
+        $entity->delete();
+
+        return response(null, 204);
     }
 }

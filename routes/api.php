@@ -29,8 +29,6 @@ Route::prefix("v1")
             QuizResponseController::class,
         );
 
-        Route::resource("entities", EntityController::class);
-
         Route::get("questions/{question}/check", [
             CheckQuestionController::class,
             "show",
@@ -45,6 +43,8 @@ Route::prefix("v1")
             "quizzes/{group}/{slug}/{entity}/submit",
             SubmitQuizController::class,
         );
+
+        Route::apiResource("entity", EntityController::class);
     });
 
 Route::prefix("v1")

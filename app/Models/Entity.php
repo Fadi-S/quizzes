@@ -10,6 +10,18 @@ use Illuminate\Support\Str;
 
 class Entity extends Model
 {
+    protected static function boot()
+    {
+        static::addGlobalScope("game", function ($query) {
+            $game = Game::current();
+            if (!$game) {
+                return;
+            }
+
+            $query->whereRelation("group", "game_id", $game->id);
+        });
+    }
+
     public static function getForm(): array
     {
         return [
