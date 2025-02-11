@@ -44,7 +44,7 @@ Route::prefix("v1")
             SubmitQuizController::class,
         );
 
-        Route::apiResource("entity", EntityController::class);
+        Route::apiResource("entities", EntityController::class);
     });
 
 Route::prefix("v1")
