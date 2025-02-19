@@ -104,6 +104,15 @@ class Quiz extends Model
         return $this->hasMany(EntityQuiz::class);
     }
 
+    public function scopeAddPoints($query): void
+    {
+        $query->addSelect([
+            "points" => Question::query()
+                ->selectRaw("SUM(points)")
+                ->whereColumn("questions.quiz_id", "quizzes.id"),
+        ]);
+    }
+
     public static function getForm(): array
     {
         return [

@@ -70,7 +70,7 @@ namespace App\Models{
  * @property int $id
  * @property int $entity_id
  * @property int $question_id
- * @property string $answer
+ * @property array $answer
  * @property int $is_correct
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -249,7 +249,7 @@ namespace App\Models{
  * @property int $group_id
  * @property string $name
  * @property string $slug
- * @property string|null $data
+ * @property array|null $data
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Game|null $game
@@ -258,6 +258,7 @@ namespace App\Models{
  * @property-read int|null $questions_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\EntityQuiz> $responses
  * @property-read int|null $responses_count
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Quiz addPoints()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Quiz newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Quiz newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Quiz query()

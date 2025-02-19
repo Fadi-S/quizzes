@@ -33,6 +33,8 @@ class QuizResource extends JsonResource
                 "questions",
                 fn() => QuestionResource::collection($this->questions),
             ),
+
+            "points" => $this->points,
         ];
     }
 }

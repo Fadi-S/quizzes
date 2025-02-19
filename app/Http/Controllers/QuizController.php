@@ -11,7 +11,9 @@ class QuizController extends Controller
     public function index()
     {
         return response()->json([
-            "quizzes" => QuizResource::collection(Quiz::all()),
+            "quizzes" => QuizResource::collection(
+                Quiz::query()->addPoints()->get(),
+            ),
         ]);
     }
 
@@ -32,6 +34,7 @@ class QuizController extends Controller
             ->whereRelation("group", "slug", "=", $group)
             ->where("slug", $slug)
             ->with("questions.options")
+            ->addPoints()
             ->firstOrFail();
 
         return response()->json([
