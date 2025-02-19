@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\QuizResource;
+use App\Models\Entity;
 use App\Models\Quiz;
 use Illuminate\Http\Request;
 
@@ -14,8 +15,22 @@ class QuizController extends Controller
 
         if ($request->has("entity")) {
             $quizzes
-                ->leftJoin("entity_quiz", "entity_id", "=", $request->entity)
-                ->selectRaw("quizzes.*, entity_id");
+                ->where(
+                    "group_id",
+                    "=",
+                    Entity::query()
+                        ->where("id", "=", $request->entity)
+                        ->first(["group_id"])->group_id,
+                )
+                ->leftJoinWhere(
+                    "entity_quizzes",
+                    "entity_id",
+                    "=",
+                    $request->entity,
+                )
+                ->selectRaw(
+                    "quizzes.*, IFNULL(entity_quizzes.entity_id, 0) as is_solved",
+                );
         }
 
         $quizzes = $quizzes->get();

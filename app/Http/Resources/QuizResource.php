@@ -37,8 +37,8 @@ class QuizResource extends JsonResource
             "points" => $this->points ? ((int) $this->points) : 0,
 
             "is_solved" => $this->when(
-                property_exists($this, "entity_id"),
-                fn() => $this->entity_id !== null,
+                $this->is_solved !== null,
+                fn() => $this->is_solved != 0,
             ),
         ];
     }
