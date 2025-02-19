@@ -8,12 +8,20 @@ use Illuminate\Http\Request;
 
 class QuizController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $quizzes = Quiz::query();
+
+        if ($request->has("entity")) {
+            $quizzes
+                ->leftJoin("entity_quiz", "entity_id", "=", $request->entity)
+                ->selectRaw("quizzes.*, entity_id");
+        }
+
+        $quizzes = $quizzes->get();
+
         return response()->json([
-            "quizzes" => QuizResource::collection(
-                Quiz::query()->addPoints()->get(),
-            ),
+            "quizzes" => QuizResource::collection($quizzes),
         ]);
     }
 
@@ -34,7 +42,6 @@ class QuizController extends Controller
             ->whereRelation("group", "slug", "=", $group)
             ->where("slug", $slug)
             ->with("questions.options")
-            ->addPoints()
             ->firstOrFail();
 
         return response()->json([

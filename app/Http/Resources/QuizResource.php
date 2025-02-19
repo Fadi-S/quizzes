@@ -34,7 +34,12 @@ class QuizResource extends JsonResource
                 fn() => QuestionResource::collection($this->questions),
             ),
 
-            "points" => $this->points,
+            "points" => $this->points ? ((int) $this->points) : 0,
+
+            "is_solved" => $this->when(
+                property_exists($this, "entity_id"),
+                fn() => $this->entity_id !== null,
+            ),
         ];
     }
 }

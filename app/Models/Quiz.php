@@ -31,6 +31,10 @@ class Quiz extends Model
             );
         });
 
+        static::addGlobalScope("addPoints", function ($model) {
+            $model->addPoints();
+        });
+
         parent::booting();
     }
 
