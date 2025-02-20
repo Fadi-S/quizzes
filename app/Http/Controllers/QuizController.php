@@ -35,7 +35,15 @@ class QuizController extends Controller
                     "=",
                     "quizzes.id",
                 )
-                ->where("entity_quizzes.entity_id", "=", $request->entity)
+                ->where(
+                    fn($query) => $query
+                        ->where(
+                            "entity_quizzes.entity_id",
+                            "=",
+                            $request->entity,
+                        )
+                        ->orWhereNull("entity_quizzes.entity_id"),
+                )
                 ->selectRaw(
                     "quizzes.*, IFNULL(entity_quizzes.entity_id, 0) as is_solved",
                 );
