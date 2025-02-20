@@ -16,34 +16,20 @@ class QuizController extends Controller
         if ($request->has("entity")) {
             $entity = Entity::query()
                 ->where("id", "=", $request->entity)
-                ->first(["group_id"]);
+                ->first(["id", "group_id"]);
 
             if (!$entity) {
-                return response()->json(
-                    [
-                        "message" => "Entity not found",
-                    ],
-                    404,
-                );
+                return response()->json(["message" => "Entity not found"], 404);
             }
 
             $quizzes
                 ->where("group_id", "=", $entity->group_id)
-                ->leftJoin(
-                    "entity_quizzes",
-                    "entity_quizzes.quiz_id",
-                    "=",
-                    "quizzes.id",
-                )
-                ->where(
-                    fn($query) => $query
-                        ->where(
-                            "entity_quizzes.entity_id",
-                            "=",
-                            $request->entity,
-                        )
-                        ->orWhereNull("entity_quizzes.entity_id"),
-                )
+                ->leftJoin("entity_quizzes", function ($join) use ($entity) {
+                    $join
+                        ->on("entity_quizzes.quiz_id", "=", "quizzes.id")
+                        ->where("entity_quizzes.entity_id", "=", $entity->id)
+                        ->orWhereNull("entity_quizzes.entity_id");
+                })
                 ->selectRaw(
                     "quizzes.*, IFNULL(entity_quizzes.entity_id, 0) as is_solved",
                 );
