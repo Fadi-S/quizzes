@@ -29,12 +29,13 @@ class QuizController extends Controller
 
             $quizzes
                 ->where("group_id", "=", $entity->group_id)
-                ->leftJoinWhere(
+                ->leftJoin(
                     "entity_quizzes",
-                    "entity_id",
+                    "entity_quizzes.quiz_id",
                     "=",
-                    $request->entity,
+                    "quizzes.id",
                 )
+                ->where("entity_quizzes.entity_id", "=", $request->entity)
                 ->selectRaw(
                     "quizzes.*, IFNULL(entity_quizzes.entity_id, 0) as is_solved",
                 );
