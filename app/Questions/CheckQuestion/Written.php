@@ -14,7 +14,11 @@ readonly class Written implements CheckQuestion
     ): QuestionResponse {
         $question->load("options");
 
-        $check = $question->options->contains("name", "=", $answer);
+        $options = $question->options
+            ->pluck("name")
+            ->map(fn($name) => strtolower($name));
+
+        $check = $options->contains(strtolower($answer));
 
         return new QuestionResponse(
             points: $check ? 1 : 0,
