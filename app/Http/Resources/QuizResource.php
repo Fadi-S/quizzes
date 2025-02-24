@@ -40,6 +40,8 @@ class QuizResource extends JsonResource
                 $this->is_solved !== null,
                 fn() => $this->is_solved != 0,
             ),
+
+            "points_won" => $this->points_won ?? 0,
         ];
     }
 }

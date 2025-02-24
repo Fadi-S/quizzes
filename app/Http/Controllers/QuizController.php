@@ -31,7 +31,7 @@ class QuizController extends Controller
                         ->orWhereNull("entity_quizzes.entity_id");
                 })
                 ->selectRaw(
-                    "quizzes.*, IFNULL(entity_quizzes.entity_id, 0) as is_solved",
+                    "quizzes.*, IFNULL(entity_quizzes.entity_id, 0) as is_solved, entity_quizzes.points as points_won",
                 );
         }
 
