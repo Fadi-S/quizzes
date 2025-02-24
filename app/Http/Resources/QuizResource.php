@@ -41,6 +41,11 @@ class QuizResource extends JsonResource
                 fn() => $this->is_solved != 0,
             ),
 
+            "questions_count" => $this->whenCounted(
+                "questions",
+                fn() => $this->questions_count,
+            ),
+
             "points_won" => $this->points_won ?? 0,
         ];
     }

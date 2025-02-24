@@ -11,7 +11,7 @@ class QuizController extends Controller
 {
     public function index(Request $request)
     {
-        $quizzes = Quiz::query();
+        $quizzes = Quiz::query()->withCount("questions");
 
         if ($request->has("entity")) {
             $entity = Entity::query()
