@@ -11,7 +11,16 @@ class QuizController extends Controller
 {
     public function index(Request $request)
     {
-        $quizzes = Quiz::query()->withCount("questions");
+        $quizzes = Quiz::query()
+            ->when(
+                $request->has("published"),
+                fn($query) => $query->where(
+                    "published_at",
+                    "<=",
+                    now()->format("Y-m-d H:i:s"),
+                ),
+            )
+            ->withCount("questions");
 
         if ($request->has("entity")) {
             $entity = Entity::query()

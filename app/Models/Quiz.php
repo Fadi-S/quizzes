@@ -147,6 +147,11 @@ class Quiz extends Model
                 ->options(fn() => Group::pluck("name", "id"))
                 ->required()
                 ->searchable(),
+
+            Forms\Components\DateTimePicker::make("published_at")
+                ->label("Published At")
+                ->required(),
+
             Forms\Components\Repeater::make("questions")
                 ->columnSpan("full")
                 ->relationship()

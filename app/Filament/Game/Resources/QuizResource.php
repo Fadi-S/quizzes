@@ -38,6 +38,11 @@ class QuizResource extends Resource
                     ->searchable()
                     ->sortable(),
 
+                Tables\Columns\TextColumn::make("published_at")
+                    ->dateTime("d M Y h:i a")
+                    ->label("Published")
+                    ->sortable(),
+
                 Tables\Columns\TextColumn::make("questions_count")
                     ->label("# Questions")
                     ->sortable(),
