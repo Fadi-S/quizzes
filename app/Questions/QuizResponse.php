@@ -12,7 +12,23 @@ readonly class QuizResponse
         public int $points,
         public array $responses,
         public array $correctAnswers,
+        private string $error = "",
     ) {
+    }
+
+    public static function error($error): self
+    {
+        return new self(0, [], [], $error);
+    }
+
+    public function hasError(): bool
+    {
+        return $this->error !== "";
+    }
+
+    public function getError(): string
+    {
+        return $this->error;
     }
 
     public function toArray(): array

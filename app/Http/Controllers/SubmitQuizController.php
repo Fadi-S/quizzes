@@ -47,6 +47,15 @@ class SubmitQuizController extends Controller
             $request->get("questions"),
         );
 
+        if ($quizResponse->hasError()) {
+            return response(
+                [
+                    "message" => $quizResponse->getError(),
+                ],
+                400,
+            );
+        }
+
         return response([
             "points" => $quizResponse->points,
         ]);

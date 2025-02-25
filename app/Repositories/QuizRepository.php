@@ -5,7 +5,6 @@ namespace App\Repositories;
 use App\Models\Entity;
 use App\Models\EntityQuestion;
 use App\Models\EntityQuiz;
-use App\Models\Group;
 use App\Models\Quiz;
 use App\Questions\QuizResponse;
 
@@ -13,6 +12,16 @@ class QuizRepository
 {
     public function submit(Quiz $quiz, Entity $entity, $questions): QuizResponse
     {
+        if ($entity->group_id !== $quiz->group_id) {
+            return QuizResponse::error(
+                "Entity does not belong to the quiz group",
+            );
+        }
+
+        if (!$quiz->isPublished()) {
+            return QuizResponse::error("Quiz is not published yet");
+        }
+
         \DB::beginTransaction();
 
         $quizResponse = $quiz->correct($questions);

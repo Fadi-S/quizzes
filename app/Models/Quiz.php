@@ -108,6 +108,11 @@ class Quiz extends Model
         return $this->hasMany(EntityQuiz::class);
     }
 
+    public function isPublished(): bool
+    {
+        return $this->published_at->isPast();
+    }
+
     public function scopeAddPoints($query): void
     {
         $query->addSelect([
