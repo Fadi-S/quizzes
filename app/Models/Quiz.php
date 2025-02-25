@@ -18,7 +18,7 @@ class Quiz extends Model
 
     protected $casts = [
         "data" => "json",
-        "published_at" => "timestamp",
+        "published_at" => "datetime",
     ];
 
     protected static function booting()
