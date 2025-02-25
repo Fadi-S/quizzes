@@ -110,7 +110,7 @@ class Quiz extends Model
 
     public function isPublished(): bool
     {
-        return $this->published_at->isPast();
+        return $this->published_at?->isPast();
     }
 
     public function scopeAddPoints($query): void
