@@ -122,6 +122,11 @@ class Quiz extends Model
         ]);
     }
 
+    public function scopePublished($query): void
+    {
+        $query->where("published_at", "<=", now()->format("Y-m-d H:i:s"));
+    }
+
     public static function getForm(): array
     {
         return [

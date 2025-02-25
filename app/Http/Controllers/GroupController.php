@@ -39,15 +39,17 @@ class GroupController extends Controller
 
     public function show(Request $request, $group)
     {
-        $with = "quizzes";
-        if ($request->has("withQuestions")) {
-            $with = "$with.questions.options";
-        }
-
         $group = Group::query()
             ->where("id", "=", $group)
             ->orWhere("slug", "=", $group)
-            ->with($with)
+            ->with([
+                "quizzes" => fn($query) => $query
+                    ->published()
+                    ->when(
+                        $request->has("withQuestions"),
+                        fn($q) => $q->with("questions.options"),
+                    ),
+            ])
             ->firstOrFail();
 
         return response()->json(["group" => GroupResource::make($group)]);

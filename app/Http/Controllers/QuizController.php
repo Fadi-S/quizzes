@@ -14,11 +14,7 @@ class QuizController extends Controller
         $quizzes = Quiz::query()
             ->when(
                 $request->has("published"),
-                fn($query) => $query->where(
-                    "published_at",
-                    "<=",
-                    now()->format("Y-m-d H:i:s"),
-                ),
+                fn($query) => $query->published(),
             )
             ->withCount("questions");
 
