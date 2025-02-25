@@ -23,6 +23,7 @@ class QuizResource extends JsonResource
             "slug" => $this->slug,
             "group_id" => $this->group_id,
             "data" => $this->data,
+            "published_at" => $this->published_at?->format("Y-m-d H:i:s"),
 
             "group" => $this->whenLoaded(
                 "group",
