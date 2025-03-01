@@ -2,10 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\QuestionType;
 use App\Http\Resources\QuizResource;
 use App\Models\Entity;
+use App\Models\Group;
+use App\Models\Option;
+use App\Models\Question;
 use App\Models\Quiz;
+use Illuminate\Http\File;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class QuizController extends Controller
 {
@@ -47,12 +53,154 @@ class QuizController extends Controller
         ]);
     }
 
+    private function saveTemporaryFile($path, $dir): ?string
+    {
+        if (!Storage::exists($path)) {
+            return null;
+        }
+
+        $filename = basename($path);
+
+        $newPath = Storage::disk("public")->putFileAs(
+            $dir,
+            new File(Storage::path($path)),
+            $filename,
+        );
+
+        Storage::delete($path);
+
+        return $newPath;
+    }
+
+    private function saveQuestions(Quiz $quiz, array $questions)
+    {
+        $optionsToBeSaved = [];
+
+        $questionsKept = [];
+        foreach ($questions as $data) {
+            if (isset($data["picture"]) && $data["picture"]) {
+                $data["picture"] = $this->saveTemporaryFile(
+                    $data["picture"],
+                    "questions",
+                );
+            }
+            $dataSaved = [
+                "title" => $data["title"],
+                "type" => $data["type"],
+                "picture" => $data["picture"] ?? null,
+                "points" => $data["points"] ?? null,
+                "correct_answers" => $data["correct_answers"] ?? [],
+            ];
+
+            if (isset($data["id"])) {
+                $question = $quiz
+                    ->questions()
+                    ->where("id", "=", $data["id"])
+                    ->first();
+
+                if (!$dataSaved["picture"]) {
+                    $dataSaved["picture"] = $question->picture;
+                }
+
+                if ($dataSaved["picture"] && $question->picture) {
+                    Storage::delete($question->picture);
+                }
+
+                $question->update($dataSaved);
+            } else {
+                $question = $quiz->questions()->create($dataSaved);
+            }
+
+            $questionsKept[] = $question->id;
+
+            foreach ($data["options"] as $option) {
+                if (isset($option["picture"]) && $option["picture"]) {
+                    $option["picture"] = $this->saveTemporaryFile(
+                        $option["picture"],
+                        "options",
+                    );
+                }
+
+                $optionsToBeSaved[] = [
+                    "question_id" => $question->id,
+                    "name" => $option["name"],
+                    "order" => $option["order"],
+                    "picture" => $option["picture"] ?? null,
+                ];
+
+                $question
+                    ->options()
+                    ->whereNotIn(
+                        "name",
+                        collect($data["options"])->pluck("name"),
+                    )
+                    ->delete();
+            }
+        }
+
+        $quiz->questions()->whereNotIn("id", $questionsKept)->delete();
+
+        Option::upsert(
+            $optionsToBeSaved,
+            ["name", "question_id"],
+            ["name", "picture", "order"],
+        );
+    }
+
+    private function rules(): array
+    {
+        return [
+            "name" => "required|string|max:255",
+            "data" => "nullable|array",
+            "published_at" => "required|date",
+            "questions" => "nullable|array",
+            "questions.*.title" => "required|string|max:255",
+            "questions.*.picture" => "nullable",
+            "questions.*.points" => "nullable|numeric|min:0|max:65535",
+            "questions.*.type" =>
+                "required|numeric|in:" .
+                implode(
+                    ",",
+                    array_map(fn($case) => $case->value, QuestionType::cases()),
+                ),
+            "questions.*.correct_answers" => "required|array",
+            "questions.*.options" => "nullable|array",
+            "questions.*.options.*.name" => "required|string|max:255",
+            "questions.*.options.*.order" => "required|numeric|min:1|max:255",
+            "questions.*.options.*.picture" => "nullable",
+        ];
+    }
+
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
-        //
+        $request->validate(
+            array_merge($this->rules(), [
+                "group" => "required|string|exists:groups,slug",
+            ]),
+        );
+
+        $group = Group::query()
+            ->where("slug", "=", $request->group)
+            ->firstOrFail();
+
+        $quiz = Quiz::create([
+            "name" => $request->name,
+            "group_id" => $group->id,
+            "data" => $request->data,
+            "published_at" => $request->published_at,
+        ]);
+
+        if ($request->has("questions")) {
+            $this->saveQuestions($quiz, $request->questions);
+        }
+
+        return response()->json([
+            "message" => "Quiz created successfully",
+            "quiz" => QuizResource::make($quiz),
+        ]);
     }
 
     /**
@@ -74,9 +222,24 @@ class QuizController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Quiz $quiz)
     {
-        //
+        $request->validate($this->rules());
+
+        $quiz->update([
+            "name" => $request->name,
+            "data" => $request->data,
+            "published_at" => $request->published_at,
+        ]);
+
+        if ($request->has("questions")) {
+            $this->saveQuestions($quiz, $request->questions);
+        }
+
+        return response()->json([
+            "message" => "Quiz updated successfully",
+            "quiz" => QuizResource::make($quiz),
+        ]);
     }
 
     /**

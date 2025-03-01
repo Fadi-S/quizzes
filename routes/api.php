@@ -7,6 +7,7 @@ use App\Http\Controllers\EntityController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\QuizResponseController;
+use App\Http\Controllers\SaveFileTemporarilyController;
 use App\Http\Controllers\SubmitQuizController;
 use App\Http\Controllers\User\SubmitQuizGuestController;
 use App\Http\Middleware\EnsureApiKeyIsValid;
@@ -21,6 +22,11 @@ Route::prefix("v1")
         Route::get("all-games", AllGamesController::class);
 
         Route::resource("groups", GroupController::class);
+
+        Route::get("/upload/key", [
+            SaveFileTemporarilyController::class,
+            "url",
+        ]);
 
         Route::resource("quizzes", QuizController::class)->except("show");
 
@@ -57,3 +63,7 @@ Route::prefix("v1")
             SubmitQuizGuestController::class,
         );
     });
+
+Route::post("v1/upload", [SaveFileTemporarilyController::class, "upload"])
+    ->middleware("signed")
+    ->name("upload");
