@@ -42,10 +42,15 @@ class Quiz extends Model
     protected static function boot()
     {
         static::creating(function ($model) {
-            $model->slug = str($model->name)->slug(language: null);
+            $model->slug = self::getSlug($model->name);
         });
 
         parent::boot();
+    }
+
+    private static function getSlug($name): string
+    {
+        return str($name)->slug(language: "en");
     }
 
     public static function fromGroupAndSlug($group, $quizSlug): ?self
@@ -139,7 +144,7 @@ class Quiz extends Model
                     Forms\Set $set,
                 ) {
                     if ($operation === "create") {
-                        $set("slug", str($state)->slug(language: null));
+                        $set("slug", self::getSlug($state));
                     }
                 })
                 ->unique(
