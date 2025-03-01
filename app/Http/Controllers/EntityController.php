@@ -63,6 +63,38 @@ class EntityController extends Controller
     }
 
     /**
+     * Display the specified resource.
+     */
+    public function storeBulk(Request $request)
+    {
+        $request->validate([
+            "group" => "required|string|exists:groups,slug",
+            "entities" => "required|array",
+            "entities.*.name" => "required|string|max:255",
+            "entities.*.data" => "nullable|json",
+        ]);
+
+        $group = Group::query()
+            ->where("slug", "=", $request->get("group"))
+            ->firstOrFail();
+
+        $entities = collect($request->get("entities"))->map(
+            fn($entity) => new Entity([
+                "name" => $entity["name"],
+                "data" => $entity["data"] ?? null,
+            ]),
+        );
+
+        $entities = collect($group->entities()->saveMany($entities->all()));
+
+        return [
+            "entities" => $entities->mapWithKeys(
+                fn($entity) => [$entity->name => $entity->id],
+            ),
+        ];
+    }
+
+    /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, Entity $entity)

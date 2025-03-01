@@ -53,4 +53,9 @@ class Group extends Model
     {
         return $this->hasMany(Quiz::class);
     }
+
+    public function entities(): HasMany
+    {
+        return $this->hasMany(Entity::class);
+    }
 }

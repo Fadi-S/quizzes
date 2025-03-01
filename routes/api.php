@@ -50,6 +50,8 @@ Route::prefix("v1")
             SubmitQuizController::class,
         );
 
+        Route::post("entities/bulk", [EntityController::class, "storeBulk"]);
+
         Route::apiResource("entities", EntityController::class);
     });
 

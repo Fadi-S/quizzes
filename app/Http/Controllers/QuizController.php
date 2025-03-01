@@ -12,6 +12,7 @@ use App\Models\Quiz;
 use Illuminate\Http\File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class QuizController extends Controller
 {
@@ -147,27 +148,44 @@ class QuizController extends Controller
         );
     }
 
-    private function rules(): array
+    private function rules($groupId, $ignore = null): array
     {
         return [
-            "name" => "required|string|max:255",
-            "data" => "nullable|array",
-            "published_at" => "required|date",
-            "questions" => "nullable|array",
-            "questions.*.title" => "required|string|max:255",
-            "questions.*.picture" => "nullable",
-            "questions.*.points" => "nullable|numeric|min:0|max:65535",
+            "name" => [
+                "required",
+                "string",
+                "max:255",
+                Rule::unique("quizzes", "name")
+                    ->where("group_id", $groupId)
+                    ->ignore($ignore),
+            ],
+            "data" => ["nullable", "array"],
+            "published_at" => ["required", "date"],
+            "questions" => ["nullable", "array"],
+            "questions.*.title" => ["required", "string", "max:255"],
+            "questions.*.picture" => ["nullable"],
+            "questions.*.points" => [
+                "nullable",
+                "numeric",
+                "min:0",
+                "max:65535",
+            ],
             "questions.*.type" =>
                 "required|numeric|in:" .
                 implode(
                     ",",
                     array_map(fn($case) => $case->value, QuestionType::cases()),
                 ),
-            "questions.*.correct_answers" => "required|array",
-            "questions.*.options" => "nullable|array",
-            "questions.*.options.*.name" => "required|string|max:255",
-            "questions.*.options.*.order" => "required|numeric|min:1|max:255",
-            "questions.*.options.*.picture" => "nullable",
+            "questions.*.correct_answers" => ["required", "array"],
+            "questions.*.options" => ["nullable", "array"],
+            "questions.*.options.*.name" => ["required", "string", "max:255"],
+            "questions.*.options.*.order" => [
+                "required",
+                "numeric",
+                "min:1",
+                "max:255",
+            ],
+            "questions.*.options.*.picture" => ["nullable"],
         ];
     }
 
@@ -176,15 +194,15 @@ class QuizController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate(
-            array_merge($this->rules(), [
-                "group" => "required|string|exists:groups,slug",
-            ]),
-        );
-
         $group = Group::query()
             ->where("slug", "=", $request->group)
             ->firstOrFail();
+
+        $request->validate(
+            array_merge($this->rules($group->id), [
+                "group" => "required|string|exists:groups,slug",
+            ]),
+        );
 
         $quiz = Quiz::create([
             "name" => $request->name,
@@ -224,7 +242,7 @@ class QuizController extends Controller
      */
     public function update(Request $request, Quiz $quiz)
     {
-        $request->validate($this->rules());
+        $request->validate($this->rules($quiz->group_id, $quiz->id));
 
         $quiz->update([
             "name" => $request->name,
