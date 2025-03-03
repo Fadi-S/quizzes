@@ -62,11 +62,9 @@ class QuizController extends Controller
 
         $filename = basename($path);
 
-        $newPath = Storage::disk("public")->putFileAs(
-            $dir,
-            new File(Storage::path($path)),
-            $filename,
-        );
+        $newPath = Storage::disk(
+            config("filament.default_filesystem_disk"),
+        )->putFileAs($dir, new File(Storage::path($path)), $filename);
 
         Storage::delete($path);
 
@@ -79,12 +77,18 @@ class QuizController extends Controller
 
         $questionsKept = [];
         foreach ($questions as $data) {
+            $removePicture = ($data["picture"] ?? null) === "removed";
+            if ($removePicture) {
+                $data["picture"] = null;
+            }
+
             if (isset($data["picture"]) && $data["picture"]) {
                 $data["picture"] = $this->saveTemporaryFile(
                     $data["picture"],
                     "questions",
                 );
             }
+
             $dataSaved = [
                 "title" => $data["title"],
                 "type" => $data["type"],
@@ -99,11 +103,14 @@ class QuizController extends Controller
                     ->where("id", "=", $data["id"])
                     ->first();
 
-                if (!$dataSaved["picture"]) {
+                if (!$removePicture && !$dataSaved["picture"]) {
                     $dataSaved["picture"] = $question->picture;
                 }
 
-                if ($dataSaved["picture"] && $question->picture) {
+                if (
+                    $removePicture ||
+                    ($dataSaved["picture"] && $question->picture)
+                ) {
                     Storage::delete($question->picture);
                 }
 
@@ -115,6 +122,11 @@ class QuizController extends Controller
             $questionsKept[] = $question->id;
 
             foreach ($data["options"] as $option) {
+                $removePicture = ($option["picture"] ?? null) === "removed";
+                if ($removePicture) {
+                    $option["picture"] = null;
+                }
+
                 if (isset($option["picture"]) && $option["picture"]) {
                     $option["picture"] = $this->saveTemporaryFile(
                         $option["picture"],

@@ -66,6 +66,16 @@ Route::prefix("v1")
         );
     });
 
-Route::post("v1/upload", [SaveFileTemporarilyController::class, "upload"])
+Route::prefix("v1")
     ->middleware("signed")
-    ->name("upload");
+    ->group(function () {
+        Route::post("upload", [
+            SaveFileTemporarilyController::class,
+            "upload",
+        ])->name("upload");
+
+        Route::get("/proxy", [
+            SaveFileTemporarilyController::class,
+            "proxy",
+        ])->name("proxy");
+    });
