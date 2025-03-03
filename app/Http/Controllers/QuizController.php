@@ -62,9 +62,18 @@ class QuizController extends Controller
 
         $filename = basename($path);
 
+        $fileContent = Storage::get($path);
+
+        $tempFilePath = tempnam(sys_get_temp_dir(), "s3file");
+        file_put_contents($tempFilePath, $fileContent);
+
+        $file = new File($tempFilePath);
+
         $newPath = Storage::disk(
             config("filament.default_filesystem_disk"),
-        )->putFileAs($dir, new File(Storage::path($path)), $filename);
+        )->putFileAs($dir, $file, $filename);
+
+        unlink($tempFilePath);
 
         Storage::delete($path);
 
@@ -108,8 +117,8 @@ class QuizController extends Controller
                 }
 
                 if (
-                    $removePicture ||
-                    ($dataSaved["picture"] && $question->picture)
+                    $question->picture &&
+                    ($removePicture || $dataSaved["picture"])
                 ) {
                     Storage::delete($question->picture);
                 }
