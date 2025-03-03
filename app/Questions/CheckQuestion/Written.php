@@ -21,7 +21,7 @@ readonly class Written implements CheckQuestion
         $check = $options->contains(strtolower($answer));
 
         return new QuestionResponse(
-            points: $check ? 1 : 0,
+            points: $check ? $question->points : 0,
             response: $answer,
             isCorrect: $check,
         );
