@@ -46,7 +46,7 @@ trait Linkable
         if (!config("filesystems.cloudfront.enabled")) {
             return \URL::temporarySignedRoute("proxy", $expires, [
                 "path" => $path,
-                "disk" => "public",
+                "disk" => config("filament.default_filesystem_disk"),
             ]);
         }
 
