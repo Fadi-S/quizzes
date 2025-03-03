@@ -71,6 +71,11 @@ class Question extends Model
         return $this->options->sortBy("order");
     }
 
+    public function getOptionsWithAnswerAttribute(): Collection
+    {
+        return $this->options->sortBy("order");
+    }
+
     public function responses(): HasMany
     {
         return $this->hasMany(EntityQuestion::class);

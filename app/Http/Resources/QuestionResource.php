@@ -31,7 +31,9 @@ class QuestionResource extends JsonResource
             "options" => $this->when(
                 $this->relationLoaded("options"),
                 fn() => OptionResource::collection(
-                    $this->options_with_correct_order,
+                    $request->has("withAnswers")
+                        ? $this->options_with_answer
+                        : $this->options_with_correct_order,
                 ),
             ),
         ];
