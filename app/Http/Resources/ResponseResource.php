@@ -31,23 +31,25 @@ class ResponseResource extends JsonResource
 
             "answers" => $this->whenLoaded(
                 "answers",
-                fn() => $this->answers->mapWithKeys(function ($answer) {
-                    $data = [
-                        "id" => $answer->id,
-                        "question_id" => $answer->question_id,
-                        "is_correct" => $answer->is_correct,
-                        "answer" => $answer->answer,
-                        "points" => $answer->points,
-                    ];
+                fn() => (object) $this->answers
+                    ->mapWithKeys(function ($answer) {
+                        $data = [
+                            "id" => $answer->id,
+                            "question_id" => $answer->question_id,
+                            "is_correct" => $answer->is_correct,
+                            "answer" => $answer->answer,
+                            "points" => $answer->points,
+                        ];
 
-                    if ($answer->relationLoaded("question")) {
-                        $data["question"] = QuestionResource::make(
-                            $answer->question,
-                        );
-                    }
+                        if ($answer->relationLoaded("question")) {
+                            $data["question"] = QuestionResource::make(
+                                $answer->question,
+                            );
+                        }
 
-                    return [$answer->question_id => $data];
-                }),
+                        return [$answer->question_id => $data];
+                    })
+                    ->all(),
             ),
         ];
     }
