@@ -7,6 +7,7 @@ use App\Http\Controllers\EntityController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\QuizResponseController;
+use App\Http\Controllers\ResponsesController;
 use App\Http\Controllers\SaveFileTemporarilyController;
 use App\Http\Controllers\SubmitQuizController;
 use App\Http\Controllers\User\SubmitQuizGuestController;
@@ -27,6 +28,11 @@ Route::prefix("v1")
             SaveFileTemporarilyController::class,
             "url",
         ]);
+
+        Route::patch("/responses/{response}/correct", [
+            ResponsesController::class,
+            "markAsCorrect",
+        ])->name("responses.mark-as-correct");
 
         Route::resource("quizzes", QuizController::class)->except("show");
 
