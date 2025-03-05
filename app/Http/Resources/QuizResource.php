@@ -30,6 +30,11 @@ class QuizResource extends JsonResource
                 fn() => GroupResource::make($this->group),
             ),
 
+            "responses" => $this->whenLoaded(
+                "responses",
+                fn() => ResponseResource::collection($this->responses),
+            ),
+
             "questions" => $this->whenLoaded(
                 "questions",
                 fn() => QuestionResource::collection($this->questions),

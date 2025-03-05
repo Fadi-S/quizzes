@@ -245,12 +245,18 @@ class QuizController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($group, $slug)
+    public function show($group, $slug, Request $request)
     {
         $quiz = Quiz::query()
             ->whereRelation("group", "slug", "=", $group)
             ->where("slug", $slug)
             ->with("questions.options")
+            ->when(
+                $request->has("withResponses"),
+                fn($query) => $query->with([
+                    "responses" => fn($q) => $q->with(["entity", "answers"]),
+                ]),
+            )
             ->firstOrFail();
 
         return response()->json([
