@@ -14,12 +14,15 @@ trait Linkable
             return null;
         }
 
-        if (!($keyPair = config("filesystems.cloudfront.key_pair_id"))) {
+        if (!($keyPair = config("filesystems.disks.cloudfront.key_pair_id"))) {
             return Storage::temporaryUrl($path, $ttl);
         }
 
         $resourceKey =
-            "https://" . config("filesystems.cloudfront.domain") . "/" . $path;
+            "https://" .
+            config("filesystems.disks.cloudfront.domain") .
+            "/" .
+            $path;
 
         $cloudFrontClient = new CloudFrontClient([
             "profile" => "default",
@@ -30,7 +33,7 @@ trait Linkable
         return $cloudFrontClient->getSignedUrl([
             "url" => $resourceKey,
             "expires" => $ttl->getTimestamp(),
-            "private_key" => config("filesystems.cloudfront.private_key"),
+            "private_key" => config("filesystems.disks.cloudfront.private_key"),
             "key_pair_id" => $keyPair,
         ]);
     }
@@ -43,7 +46,7 @@ trait Linkable
 
         $expires = now()->addMinutes(60);
 
-        if (!config("filesystems.cloudfront.enabled")) {
+        if (!config("filesystems.disks.cloudfront.enabled")) {
             return \URL::temporarySignedRoute("proxy", $expires, [
                 "path" => $path,
                 "disk" => config("filament.default_filesystem_disk"),
