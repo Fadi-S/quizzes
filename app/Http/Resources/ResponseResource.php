@@ -28,6 +28,7 @@ class ResponseResource extends JsonResource
                 fn() => QuizResource::make($this->quiz),
             ),
             "points" => $this->points,
+            "created_at" => $this->created_at?->format("Y-m-d H:i:s"),
 
             "answers" => $this->whenLoaded(
                 "answers",
