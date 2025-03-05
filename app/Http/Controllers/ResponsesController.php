@@ -33,6 +33,8 @@ class ResponsesController extends Controller
             "message" => "Response marked as correct",
             "points" => $response->points,
             "entity_id" => $response->entity_id,
+            "quiz_id" => $response->question->quiz_id,
+            "question_id" => $response->question_id,
         ]);
     }
 }
