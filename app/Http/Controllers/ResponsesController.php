@@ -32,6 +32,7 @@ class ResponsesController extends Controller
         return response()->json([
             "message" => "Response marked as correct",
             "points" => $response->points,
+            "entity_id" => $response->entity_id,
         ]);
     }
 }
