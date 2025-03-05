@@ -27,6 +27,7 @@ class ResponseResource extends JsonResource
                 "quiz",
                 fn() => QuizResource::make($this->quiz),
             ),
+            "points" => $this->points,
 
             "answers" => $this->whenLoaded(
                 "answers",

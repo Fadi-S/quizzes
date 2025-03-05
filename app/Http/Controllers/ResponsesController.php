@@ -10,6 +10,15 @@ class ResponsesController extends Controller
 {
     public function markAsCorrect(EntityQuestion $response)
     {
+        if ($response->is_correct) {
+            return response()->json(
+                [
+                    "message" => "Response already marked as correct",
+                ],
+                400,
+            );
+        }
+
         $response->load("question");
 
         $entityQuiz = EntityQuiz::query()
@@ -17,7 +26,7 @@ class ResponsesController extends Controller
             ->where("entity_id", "=", $response->entity_id)
             ->first();
 
-        \DB::transaction();
+        \DB::beginTransaction();
 
         $response->is_correct = true;
         $response->points = $response->question->points;
