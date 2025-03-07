@@ -182,6 +182,7 @@ class QuizController extends Controller
             ],
             "data" => ["nullable", "array"],
             "published_at" => ["required", "date"],
+            "available_until" => ["nullable", "date", "after:published_at"],
             "questions" => ["nullable", "array"],
             "questions.*.title" => ["required", "string", "max:255"],
             "questions.*.picture" => ["nullable"],

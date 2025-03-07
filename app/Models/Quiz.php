@@ -19,6 +19,7 @@ class Quiz extends Model
     protected $casts = [
         "data" => "json",
         "published_at" => "datetime",
+        "available_until" => "datetime",
     ];
 
     protected static function booting()
@@ -166,7 +167,11 @@ class Quiz extends Model
 
             Forms\Components\DateTimePicker::make("published_at")
                 ->label("Published At")
-                ->required(),
+                ->nullable(),
+
+            Forms\Components\DateTimePicker::make("available_until")
+                ->label("Available Until")
+                ->nullable(),
 
             Forms\Components\Repeater::make("questions")
                 ->columnSpan("full")
