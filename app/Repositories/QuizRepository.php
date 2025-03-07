@@ -22,6 +22,10 @@ class QuizRepository
             return QuizResponse::error("Quiz is not published yet");
         }
 
+        if (!$quiz->isAvailable()) {
+            return QuizResponse::error("Quiz is not available anymore");
+        }
+
         \DB::beginTransaction();
 
         $quizResponse = $quiz->correct($questions);

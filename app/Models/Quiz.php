@@ -117,7 +117,20 @@ class Quiz extends Model
 
     public function isPublished(): bool
     {
+        if (!$this->published_at) {
+            return true;
+        }
+
         return $this->published_at?->isPast();
+    }
+
+    public function isAvailable(): bool
+    {
+        if (!$this->available_until) {
+            return true;
+        }
+
+        return $this->available_until?->isFuture();
     }
 
     public function scopeAddPoints($query): void
