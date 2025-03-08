@@ -30,26 +30,26 @@ class QuizRepository
 
         $quizResponse = $quiz->correct($questions);
 
+        $entityQuiz = EntityQuiz::create([
+            "entity_id" => $entity->id,
+            "quiz_id" => $quiz->id,
+            "points" => $quizResponse->points,
+        ]);
+
         $entityQuestions = [];
         foreach ($quizResponse->responses as $questionId => $response) {
             $entityQuestions[] = [
                 "question_id" => $questionId,
-                "entity_id" => $entity->id,
+                "entity_quiz_id" => $entityQuiz->id,
                 "answer" => json_encode($response->response),
                 "points" => $response->points,
                 "is_correct" => $response->isCorrect,
             ];
         }
 
-        EntityQuiz::create([
-            "entity_id" => $entity->id,
-            "quiz_id" => $quiz->id,
-            "points" => $quizResponse->points,
-        ]);
-
         EntityQuestion::upsert(
             $entityQuestions,
-            ["question_id", "entity_id"],
+            ["question_id", "entity_quiz_id"],
             ["answer", "points", "is_correct"],
         );
 
