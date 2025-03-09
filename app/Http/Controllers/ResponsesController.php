@@ -46,4 +46,17 @@ class ResponsesController extends Controller
             "question_id" => $response->question_id,
         ]);
     }
+
+    public function delete(EntityQuestion $response)
+    {
+        $response->delete();
+
+        return response()->json(
+            [
+                "message" => "Response deleted",
+                "points" => $response->points,
+            ],
+            204,
+        );
+    }
 }

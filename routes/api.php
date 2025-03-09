@@ -34,6 +34,11 @@ Route::prefix("v1")
             "markAsCorrect",
         ])->name("responses.mark-as-correct");
 
+        Route::delete("/responses/{response}", [
+            ResponsesController::class,
+            "delete",
+        ]);
+
         Route::resource("quizzes", QuizController::class)->except("show");
 
         Route::get(
