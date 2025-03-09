@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\QuizResource;
 use App\Models\EntityQuestion;
 use App\Models\EntityQuiz;
 use Illuminate\Http\Request;
@@ -47,16 +48,17 @@ class ResponsesController extends Controller
         ]);
     }
 
-    public function delete(EntityQuestion $response)
+    public function delete(EntityQuiz $response)
     {
+        $response->load("quiz");
         $response->delete();
 
-        return response()->json(
-            [
-                "message" => "Response deleted",
-                "points" => $response->points,
-            ],
-            204,
-        );
+        return response()->json([
+            "message" => "Response deleted",
+            "points" => $response->points,
+            "entity_id" => $response->entity_id,
+            "quiz" => QuizResource::make($response->quiz),
+            "response_at" => $response->created_at?->format("Y-m-d H:i:s"),
+        ]);
     }
 }
