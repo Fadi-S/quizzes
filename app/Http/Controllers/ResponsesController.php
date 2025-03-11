@@ -22,10 +22,7 @@ class ResponsesController extends Controller
 
         $response->load("question");
 
-        $entityQuiz = EntityQuiz::query()
-            ->where("quiz_id", "=", $response->question->quiz_id)
-            ->where("entity_id", "=", $response->entity_id)
-            ->first();
+        $entityQuiz = EntityQuiz::findOrFail($response->entity_quiz_id);
 
         \DB::beginTransaction();
 
@@ -42,7 +39,7 @@ class ResponsesController extends Controller
         return response()->json([
             "message" => "Response marked as correct",
             "points" => $response->points,
-            "entity_id" => $response->entity_id,
+            "entity_id" => $entityQuiz->entity_id,
             "quiz_id" => $response->question->quiz_id,
             "question_id" => $response->question_id,
         ]);

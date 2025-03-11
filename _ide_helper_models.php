@@ -68,21 +68,21 @@ namespace App\Models{
  * 
  *
  * @property int $id
- * @property int $entity_id
+ * @property int $entity_quiz_id
  * @property int $question_id
  * @property array $answer
  * @property int $is_correct
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property int $points
- * @property-read \App\Models\Entity $entity
+ * @property-read \App\Models\Entity|null $entity
  * @property-read \App\Models\Question $question
  * @method static \Illuminate\Database\Eloquent\Builder<static>|EntityQuestion newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|EntityQuestion newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|EntityQuestion query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|EntityQuestion whereAnswer($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|EntityQuestion whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|EntityQuestion whereEntityId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|EntityQuestion whereEntityQuizId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|EntityQuestion whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|EntityQuestion whereIsCorrect($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|EntityQuestion wherePoints($value)
@@ -165,6 +165,8 @@ namespace App\Models{
  * @property array|null $data
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Entity> $entities
+ * @property-read int|null $entities_count
  * @property-read \App\Models\Game $game
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Quiz> $quizzes
  * @property-read int|null $quizzes_count
@@ -218,6 +220,7 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property string|null $data
  * @property int|null $points
+ * @property-read \Illuminate\Support\Collection $options_with_answer
  * @property-read \Illuminate\Support\Collection $options_with_correct_order
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Option> $options
  * @property-read int|null $options_count
@@ -250,8 +253,10 @@ namespace App\Models{
  * @property string $name
  * @property string $slug
  * @property array|null $data
+ * @property \Illuminate\Support\Carbon|null $published_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property \Illuminate\Support\Carbon|null $available_until
  * @property-read \App\Models\Game|null $game
  * @property-read \App\Models\Group $group
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Question> $questions
@@ -261,12 +266,15 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Quiz addPoints()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Quiz newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Quiz newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Quiz published()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Quiz query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Quiz whereAvailableUntil($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Quiz whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Quiz whereData($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Quiz whereGroupId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Quiz whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Quiz whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Quiz wherePublishedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Quiz whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Quiz whereUpdatedAt($value)
  */
