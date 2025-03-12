@@ -22,7 +22,7 @@ class OptionResource extends JsonResource
             "order" => $this->order,
             "name" => $this->name,
             "picture" => $this->getLink($this->picture),
-
+            "picture_key" => $this->picture,
             "question" => $this->whenLoaded("question", function () {
                 return QuestionResource::make($this->question);
             }),

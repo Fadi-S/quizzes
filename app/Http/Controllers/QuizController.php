@@ -85,6 +85,11 @@ class QuizController extends Controller
         $optionsToBeSaved = [];
 
         $questionsKept = [];
+
+        $quiz->load("questions.options");
+
+        $currentQuestions = $quiz->questions->keyBy("id");
+
         foreach ($questions as $data) {
             $removePicture = ($data["picture"] ?? null) === "removed";
             if ($removePicture) {
@@ -106,17 +111,11 @@ class QuizController extends Controller
                 "correct_answers" => $data["correct_answers"] ?? [],
             ];
 
-            if (isset($data["id"])) {
-                $question = $quiz
-                    ->questions()
-                    ->where("id", "=", $data["id"])
-                    ->first();
-
+            $question = $currentQuestions->get($data["id"] ?? null);
+            if ($question) {
                 if (!$removePicture && !$dataSaved["picture"]) {
                     $dataSaved["picture"] = $question->picture;
-                }
-
-                if (
+                } elseif (
                     $question->picture &&
                     ($removePicture || $dataSaved["picture"])
                 ) {
@@ -130,6 +129,8 @@ class QuizController extends Controller
 
             $questionsKept[] = $question->id;
 
+            $optionsByName = $question->options->keyBy("id");
+
             foreach ($data["options"] as $option) {
                 $removePicture = ($option["picture"] ?? null) === "removed";
                 if ($removePicture) {
@@ -141,6 +142,19 @@ class QuizController extends Controller
                         $option["picture"],
                         "options",
                     );
+                }
+
+                $currentOption = $optionsByName->get($option["id"] ?? null);
+
+                if ($currentOption) {
+                    if (!$removePicture && !$option["picture"]) {
+                        $option["picture"] = $currentOption->picture;
+                    } elseif (
+                        $currentOption->picture &&
+                        ($removePicture || $option["picture"])
+                    ) {
+                        Storage::delete($currentOption->picture);
+                    }
                 }
 
                 $optionsToBeSaved[] = [
