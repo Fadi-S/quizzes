@@ -19,6 +19,7 @@ class QuizController extends Controller
     public function index(Request $request)
     {
         $quizzes = Quiz::query()
+            ->orderBy("id", "desc")
             ->when(
                 $request->has("published"),
                 fn($query) => $query->published(),
