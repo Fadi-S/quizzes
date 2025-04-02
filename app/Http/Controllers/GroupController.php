@@ -44,6 +44,7 @@ class GroupController extends Controller
             ->orWhere("slug", "=", $group)
             ->with([
                 "quizzes" => fn($query) => $query
+                    ->orderBy("id", "desc")
                     ->when(
                         $request->has("published"),
                         fn($q) => $q->published(),
