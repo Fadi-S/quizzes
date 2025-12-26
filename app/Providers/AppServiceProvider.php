@@ -15,10 +15,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        FilamentView::registerRenderHook(
-            "panels::body.end",
-            fn(): string => Blade::render("@vite('resources/js/app.js')"),
-        );
     }
 
     /**
@@ -27,6 +23,11 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Model::unguard();
+
+        FilamentView::registerRenderHook(
+            "panels::body.end",
+            fn(): string => Blade::render("@vite('resources/js/app.js')"),
+        );
         
         if (!app()->isProduction()) {
             Model::preventsLazyLoading();
