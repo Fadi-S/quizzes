@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Enums\QuestionType;
 use App\Http\Resources\QuizResource;
+use App\Models\EntityQuestion;
+use App\Models\EntityQuiz;
 use App\Models\Entity;
 use App\Models\Group;
 use App\Models\Option;
@@ -11,6 +13,8 @@ use App\Models\Question;
 use App\Models\Quiz;
 use Illuminate\Http\File;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
@@ -79,6 +83,244 @@ class QuizController extends Controller
         Storage::delete($path);
 
         return $newPath;
+    }
+
+    private function validateAnsweredQuestionEdits(Quiz $quiz, array $questions): void
+    {
+        $quiz->loadMissing("questions.options", "responses.answers");
+
+        $answeredQuestionIds = $quiz->responses
+            ->flatMap(fn($response) => $response->answers->pluck("question_id"))
+            ->unique()
+            ->values();
+
+        if ($answeredQuestionIds->isEmpty()) {
+            return;
+        }
+
+        $currentQuestions = $quiz->questions->keyBy("id");
+        $incomingQuestions = collect($questions)
+            ->filter(fn($question) => isset($question["id"]))
+            ->keyBy("id");
+
+        $deletedAnsweredQuestionIds = $answeredQuestionIds->diff(
+            $incomingQuestions->keys(),
+        );
+
+        if ($deletedAnsweredQuestionIds->isNotEmpty()) {
+            abort(
+                422,
+                "Answered questions cannot be deleted after users have responded.",
+            );
+        }
+
+        foreach ($answeredQuestionIds as $questionId) {
+            $currentQuestion = $currentQuestions->get($questionId);
+            $incomingQuestion = $incomingQuestions->get($questionId);
+
+            if (!$currentQuestion || !$incomingQuestion) {
+                continue;
+            }
+
+            if ((int) $currentQuestion->type->value !== (int) $incomingQuestion["type"]) {
+                abort(
+                    422,
+                    "Question type cannot be changed after users have responded.",
+                );
+            }
+
+            if (
+                in_array(
+                    $currentQuestion->type,
+                    [
+                        QuestionType::Choose,
+                        QuestionType::MultipleChoose,
+                        QuestionType::Order,
+                    ],
+                    true,
+                )
+            ) {
+                $currentOptionIds = $currentQuestion->options
+                    ->sortBy("order")
+                    ->pluck("id")
+                    ->values();
+                $incomingOptionIds = collect($incomingQuestion["options"] ?? [])
+                    ->map(fn($option) => $option["id"] ?? null)
+                    ->values();
+
+                if (
+                    $incomingOptionIds->contains(null) ||
+                    $currentOptionIds->count() !== $incomingOptionIds->count() ||
+                    $currentOptionIds->values()->all() !== $incomingOptionIds->values()->all()
+                ) {
+                    abort(
+                        422,
+                        "Answered choice and reorder questions cannot have options added, removed, or reordered.",
+                    );
+                }
+            }
+        }
+    }
+
+    private function getChangedExistingQuestionIds(
+        Quiz $quiz,
+        array $questions,
+    ): Collection {
+        $quiz->loadMissing("questions.options");
+
+        $currentQuestions = $quiz->questions->keyBy("id");
+
+        return collect($questions)
+            ->filter(fn($question) => isset($question["id"]))
+            ->filter(function ($question) use ($currentQuestions) {
+                $currentQuestion = $currentQuestions->get($question["id"]);
+
+                if (!$currentQuestion) {
+                    return false;
+                }
+
+                $currentSnapshot = [
+                    "title" => $currentQuestion->title,
+                    "type" => $currentQuestion->type->value,
+                    "points" => $currentQuestion->points,
+                    "picture" => $currentQuestion->picture,
+                    "correct_answers" => collect($currentQuestion->correct_answers)
+                        ->map(fn($answer) => (int) $answer)
+                        ->values()
+                        ->all(),
+                    "options" => $currentQuestion->options
+                        ->sortBy("order")
+                        ->values()
+                        ->map(fn($option) => [
+                            "id" => $option->id,
+                            "name" => $option->name,
+                            "order" => $option->order,
+                            "picture" => $option->picture,
+                        ])
+                        ->all(),
+                ];
+
+                $incomingSnapshot = [
+                    "title" => $question["title"],
+                    "type" => (int) $question["type"],
+                    "points" => isset($question["points"])
+                        ? (int) $question["points"]
+                        : null,
+                    "picture" => ($question["picture"] ?? null) === "removed"
+                        ? null
+                        : ($question["picture"] ?? null),
+                    "correct_answers" => collect($question["correct_answers"] ?? [])
+                        ->map(fn($answer) => (int) $answer)
+                        ->values()
+                        ->all(),
+                    "options" => collect($question["options"] ?? [])
+                        ->values()
+                        ->map(fn($option) => [
+                            "id" => $option["id"] ?? null,
+                            "name" => $option["name"],
+                            "order" => (int) $option["order"],
+                            "picture" => ($option["picture"] ?? null) === "removed"
+                                ? null
+                                : ($option["picture"] ?? null),
+                        ])
+                        ->all(),
+                ];
+
+                return $currentSnapshot !== $incomingSnapshot;
+            })
+            ->pluck("id")
+            ->values();
+    }
+
+    private function rescoreChangedQuestions(Quiz $quiz, Collection $questionIds): array
+    {
+        if ($questionIds->isEmpty()) {
+            return [
+                "questions_count" => 0,
+                "responses_count" => 0,
+                "users_count" => 0,
+                "total_delta_points" => 0,
+                "items" => [],
+            ];
+        }
+
+        $questions = Question::query()
+            ->with("options")
+            ->whereIn("id", $questionIds)
+            ->get()
+            ->keyBy("id");
+
+        $responses = EntityQuestion::query()
+            ->with(["question.options", "entityQuiz.entity"])
+            ->whereIn("question_id", $questionIds)
+            ->get();
+
+        $items = [];
+        $totalDeltaPoints = 0;
+
+        DB::transaction(function () use (
+            $responses,
+            $questions,
+            &$items,
+            &$totalDeltaPoints,
+        ) {
+            foreach ($responses as $response) {
+                $question = $questions->get($response->question_id);
+                $entityQuiz = $response->entityQuiz;
+
+                if (!$question || !$entityQuiz) {
+                    continue;
+                }
+
+                $storedAnswer = $response->answer;
+                $check = $question->check($storedAnswer);
+                $oldPoints = (int) $response->points;
+                $newPoints = (int) $check->points;
+                $deltaPoints = $newPoints - $oldPoints;
+                $oldCorrect = (bool) $response->is_correct;
+                $newCorrect = (bool) $check->isCorrect;
+
+                if (
+                    $deltaPoints === 0 &&
+                    $oldCorrect === $newCorrect &&
+                    $response->answer == $check->response
+                ) {
+                    continue;
+                }
+
+                $response->answer = $check->response;
+                $response->is_correct = $newCorrect;
+                $response->points = $newPoints;
+                $response->save();
+
+                $entityQuiz->points += $deltaPoints;
+                $entityQuiz->save();
+
+                $totalDeltaPoints += $deltaPoints;
+
+                $items[] = [
+                    "response_id" => $response->id,
+                    "entity_quiz_id" => $entityQuiz->id,
+                    "entity_id" => $entityQuiz->entity_id,
+                    "entity_name" => $entityQuiz->entity?->name,
+                    "quiz_id" => $entityQuiz->quiz_id,
+                    "question_id" => $question->id,
+                    "old_points" => $oldPoints,
+                    "new_points" => $newPoints,
+                    "delta_points" => $deltaPoints,
+                    "old_is_correct" => $oldCorrect,
+                    "new_is_correct" => $newCorrect,
+                ];
+            }
+        });
+
+        return [
+            "questions_count" => $questionIds->count(),
+            "responses_count" => count($items),
+            "users_count" => collect($items)->pluck("entity_id")->unique()->count(),
+            "total_delta_points" => $totalDeltaPoints,
+            "items" => array_values($items),
+        ];
     }
 
     private function saveQuestions(Quiz $quiz, array $questions)
@@ -287,6 +529,13 @@ class QuizController extends Controller
     {
         $request->validate($this->rules($quiz->group_id, $quiz->id));
 
+        $questions = $request->questions ?? [];
+        $this->validateAnsweredQuestionEdits($quiz, $questions);
+        $changedExistingQuestionIds = $this->getChangedExistingQuestionIds(
+            $quiz,
+            $questions,
+        );
+
         $quiz->update([
             "name" => $request->name,
             "data" => $request->data,
@@ -294,12 +543,20 @@ class QuizController extends Controller
         ]);
 
         if ($request->has("questions")) {
-            $this->saveQuestions($quiz, $request->questions);
+            $this->saveQuestions($quiz, $questions);
         }
+
+        $rescoreSummary = $this->rescoreChangedQuestions(
+            $quiz,
+            $changedExistingQuestionIds,
+        );
+
+        $quiz->load("questions.options");
 
         return response()->json([
             "message" => "Quiz updated successfully",
             "quiz" => QuizResource::make($quiz),
+            "rescore_summary" => $rescoreSummary,
         ]);
     }
 
