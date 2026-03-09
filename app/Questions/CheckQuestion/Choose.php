@@ -12,6 +12,13 @@ readonly class Choose implements CheckQuestion
         Question $question,
         array|int|string $answer,
     ): QuestionResponse {
+        if (is_array($answer)) {
+            $answer = collect($answer)
+                ->filter(fn($item) => $item !== null && $item !== "")
+                ->values()
+                ->first();
+        }
+
         $check = collect($question->correct_answers)->contains($answer);
 
         return new QuestionResponse(
