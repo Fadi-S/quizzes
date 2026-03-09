@@ -29,6 +29,11 @@ Route::prefix("v1")
             "url",
         ]);
 
+        Route::patch("/responses/{response}", [
+            ResponsesController::class,
+            "update",
+        ]);
+
         Route::patch("/responses/{response}/correct", [
             ResponsesController::class,
             "markAsCorrect",
