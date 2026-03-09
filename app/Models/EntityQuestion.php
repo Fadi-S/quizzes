@@ -22,4 +22,9 @@ class EntityQuestion extends Model
     {
         return $this->belongsTo(Entity::class);
     }
+
+    public function entityQuiz(): BelongsTo
+    {
+        return $this->belongsTo(EntityQuiz::class);
+    }
 }
