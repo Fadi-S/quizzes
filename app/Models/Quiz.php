@@ -107,7 +107,7 @@ class Quiz extends Model
 
     public function questions(): HasMany
     {
-        return $this->hasMany(Question::class)->with("options");
+        return $this->hasMany(Question::class)->orderBy("order")->with("options");
     }
 
     public function responses(): HasMany
@@ -192,12 +192,15 @@ class Quiz extends Model
                 ->collapsible()
                 ->collapsed(fn($record) => $record?->exists)
                 ->cloneable()
+                ->reorderableWithDragAndDrop()
+                ->orderColumn("order")
                 ->itemLabel(fn($state) => $state["title"] ?? "New Question *")
                 ->defaultItems(0)
                 ->saveRelationshipsUsing(function (Quiz $record, $state) {
                     $allOptions = collect();
 
                     $questionIdsInState = collect();
+                    $questionOrder = 1;
                     foreach ($state as $question) {
                         $options = $question["options"];
                         $question[
@@ -224,6 +227,8 @@ class Quiz extends Model
                         $question["picture"] = collect(
                             $question["picture"],
                         )->first();
+
+                        $question["order"] = $questionOrder++;
 
                         if (isset($question["id"])) {
                             $data = $question;

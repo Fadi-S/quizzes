@@ -24,6 +24,7 @@ class QuestionResource extends JsonResource
             "picture_key" => $this->picture,
             "type" => $this->type,
             "points" => $this->points,
+            "order" => $this->order,
             "data" => $this->data,
             "answers" => $this->when(
                 $request->has("withAnswers"),

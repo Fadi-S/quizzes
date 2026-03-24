@@ -333,7 +333,7 @@ class QuizController extends Controller
 
         $currentQuestions = $quiz->questions->keyBy("id");
 
-        foreach ($questions as $data) {
+        foreach ($questions as $questionOrder => $data) {
             $removePicture = ($data["picture"] ?? null) === "removed";
             if ($removePicture) {
                 $data["picture"] = null;
@@ -352,6 +352,7 @@ class QuizController extends Controller
                 "picture" => $data["picture"] ?? null,
                 "points" => $data["points"] ?? null,
                 "correct_answers" => $data["correct_answers"] ?? [],
+                "order" => $questionOrder + 1,
             ];
 
             $question = $currentQuestions->get($data["id"] ?? null);
