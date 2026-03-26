@@ -43,15 +43,29 @@ class Quiz extends Model
     protected static function boot()
     {
         static::creating(function ($model) {
-            $model->slug = self::getSlug($model->name);
+            $model->slug = self::getSlug($model->name, $model->group_id);
         });
 
         parent::boot();
     }
 
-    private static function getSlug($name): string
+    private static function getSlug($name, $groupId = null): string
     {
-        return str($name)->slug(language: "en");
+        $baseSlug = str($name)->slug(language: "en");
+        $slug = $baseSlug;
+        $counter = 1;
+
+        while (
+            static::withoutGlobalScopes()
+                ->where("group_id", $groupId)
+                ->where("slug", $slug)
+                ->exists()
+        ) {
+            $slug = $baseSlug . "-" . $counter;
+            $counter++;
+        }
+
+        return $slug;
     }
 
     public static function fromGroupAndSlug($group, $quizSlug): ?self
