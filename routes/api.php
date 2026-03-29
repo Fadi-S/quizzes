@@ -7,6 +7,7 @@ use App\Http\Controllers\EntityController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\QuizResponseController;
+use App\Http\Controllers\RecentEntityQuizzesController;
 use App\Http\Controllers\ResponsesController;
 use App\Http\Controllers\SaveFileTemporarilyController;
 use App\Http\Controllers\SubmitQuizController;
@@ -69,6 +70,8 @@ Route::prefix("v1")
         Route::post("entities/bulk", [EntityController::class, "storeBulk"]);
 
         Route::apiResource("entities", EntityController::class);
+
+        Route::get("entity-quizzes/recent", RecentEntityQuizzesController::class);
     });
 
 Route::prefix("v1")
