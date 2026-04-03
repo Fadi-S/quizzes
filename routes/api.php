@@ -5,6 +5,7 @@ use App\Http\Controllers\CheckQuestionController;
 use App\Http\Controllers\CurrentGameController;
 use App\Http\Controllers\EntityController;
 use App\Http\Controllers\GroupController;
+use App\Http\Controllers\Admin\QuizStatsController;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\QuizResponseController;
 use App\Http\Controllers\RecentEntityQuizzesController;
@@ -46,6 +47,46 @@ Route::prefix("v1")
         ]);
 
         Route::resource("quizzes", QuizController::class)->except("show");
+
+        Route::get("quizzes/stats/summary", [
+            QuizStatsController::class,
+            "summary",
+        ]);
+
+        Route::get("quizzes/stats/difficulty", [
+            QuizStatsController::class,
+            "difficulty",
+        ]);
+
+        Route::get("quizzes/stats/questions/hardest", [
+            QuizStatsController::class,
+            "hardestQuestions",
+        ]);
+
+        Route::get("quizzes/stats/questions/by-quiz", [
+            QuizStatsController::class,
+            "hardestQuestionsByQuiz",
+        ]);
+
+        Route::get("quizzes/stats/quizzes/{slug}/questions/hardest", [
+            QuizStatsController::class,
+            "hardestQuestionsForQuiz",
+        ]);
+
+        Route::get("quizzes/stats/questions/{question}/distribution", [
+            QuizStatsController::class,
+            "questionDistribution",
+        ]);
+
+        Route::get("quizzes/stats/attempts", [
+            QuizStatsController::class,
+            "attemptCounts",
+        ]);
+
+        Route::get("quizzes/stats/published-count", [
+            QuizStatsController::class,
+            "publishedCount",
+        ]);
 
         Route::get(
             "quizzes/{group}/{slug}/responses",
