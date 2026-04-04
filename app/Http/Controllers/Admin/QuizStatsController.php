@@ -91,7 +91,21 @@ class QuizStatsController extends Controller
             ])
             ->get();
 
-        $questionsByQuiz = $this->hardestQuestionsBaseQuery($group)
+        $rankedQuestions = DB::query()
+            ->fromSub($this->hardestQuestionsBaseQuery($group), "question_stats")
+            ->selectRaw("
+                question_stats.*,
+                ROW_NUMBER() OVER (
+                    PARTITION BY quiz_id
+                    ORDER BY accuracy ASC, attempts DESC, question_id ASC
+                ) as question_rank
+            ");
+
+        $questionsByQuiz = DB::query()
+            ->fromSub($rankedQuestions, "ranked_questions")
+            ->where("question_rank", "<=", $limit)
+            ->orderBy("quiz_id")
+            ->orderBy("question_rank")
             ->get()
             ->groupBy("quiz_id");
 
