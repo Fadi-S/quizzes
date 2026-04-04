@@ -56,9 +56,15 @@ class QuizStatsController extends Controller
     public function hardestQuestions(Request $request)
     {
         $group = $this->resolveGroup($request);
+        $page = max($request->integer("page", 0), 0);
+        $size = $this->normalizePageSize($request->integer("size", 10));
+        $baseQuery = $this->hardestQuestionsBaseQuery($group);
+        $total = DB::query()
+            ->fromSub($baseQuery, "question_stats")
+            ->count();
 
-        $questions = $this->hardestQuestionsBaseQuery($group)
-            ->limit($this->normalizeLimit($request->integer("limit", 10)))
+        $questions = $baseQuery
+            ->forPage($page + 1, $size)
             ->get()
             ->map(fn($question) => [
                 "quizId" => $question->quiz_id,
@@ -74,6 +80,10 @@ class QuizStatsController extends Controller
             ->values();
 
         return response()->json([
+            "totalElements" => $total,
+            "totalPages" => (int) ceil($total / max($size, 1)),
+            "page" => $page,
+            "size" => $size,
             "questions" => $questions,
         ]);
     }
@@ -148,10 +158,16 @@ class QuizStatsController extends Controller
     public function hardestQuestionsForQuiz(Request $request, string $slug)
     {
         $group = $this->resolveGroup($request);
+        $page = max($request->integer("page", 0), 0);
+        $size = $this->normalizePageSize($request->integer("size", 10));
+        $baseQuery = $this->hardestQuestionsBaseQuery($group)
+            ->where("quizzes.slug", $slug);
+        $total = DB::query()
+            ->fromSub($baseQuery, "question_stats")
+            ->count();
 
-        $questions = $this->hardestQuestionsBaseQuery($group)
-            ->where("quizzes.slug", $slug)
-            ->limit($this->normalizeLimit($request->integer("limit", 10)))
+        $questions = $baseQuery
+            ->forPage($page + 1, $size)
             ->get()
             ->map(fn($question) => [
                 "quizId" => $question->quiz_id,
@@ -167,6 +183,10 @@ class QuizStatsController extends Controller
             ->values();
 
         return response()->json([
+            "totalElements" => $total,
+            "totalPages" => (int) ceil($total / max($size, 1)),
+            "page" => $page,
+            "size" => $size,
             "questions" => $questions,
         ]);
     }
@@ -359,6 +379,15 @@ class QuizStatsController extends Controller
     private function normalizeLimit(int $limit): int
     {
         return $limit <= 10 ? 10 : 20;
+    }
+
+    private function normalizePageSize(int $size): int
+    {
+        if ($size <= 0) {
+            return 10;
+        }
+
+        return min($size, 50);
     }
 
     private function normalizePerQuizLimit(int $limit): int
